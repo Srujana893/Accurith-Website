@@ -1,0 +1,13 @@
+{
+  "name": "varsha-frontend",
+  "version": "1.0.0",
+  "description": "Accurith Website Frontend",
+  "main": "index.js",
+  "scripts": {
+    "start": "echo 'Start script not configured yet'",
+    "build": "echo 'Build script not configured yet'"
+  },
+  "keywords": [],
+  "author": "Varsha",
+  "license": "ISC"
+}
