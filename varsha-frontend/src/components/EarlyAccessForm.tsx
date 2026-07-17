@@ -9,7 +9,7 @@ import { submitEarlyAccess } from "@/mocks/earlyAccess";
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const inputClasses =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-400 transition-colors duration-200 hover:border-slate-400";
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-500 transition-colors duration-200 hover:border-slate-400";
 
 // V24 — simple early-access form against the mocked endpoint. Append ?fail
 // to the URL to demo the error state.
@@ -87,7 +87,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
             onChange={(e) =>
               setForm((f) => ({ ...f, product: e.target.value }))
             }
-            className={cn(inputClasses, form.product === "" && "text-slate-400")}
+            className={cn(inputClasses, form.product === "" && "text-slate-500")}
           >
             <option value="" disabled>
               Select a product…

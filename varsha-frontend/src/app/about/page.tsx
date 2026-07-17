@@ -116,7 +116,7 @@ export default function AboutPage() {
                 <h3 className="mt-3 text-lg font-medium text-navy">
                   {person.title}
                 </h3>
-                <p className="font-mono text-xs uppercase tracking-widest text-slate-400">
+                <p className="font-mono text-xs uppercase tracking-widest text-slate-500">
                   Placeholder profile
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-slate-700">

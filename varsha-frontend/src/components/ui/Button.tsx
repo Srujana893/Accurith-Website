@@ -6,8 +6,10 @@ type ButtonSize = "sm" | "md" | "lg";
 
 // One teal (primary) action per section; secondary actions use outline/ghost.
 const variantClasses: Record<ButtonVariant, string> = {
+  // teal-700 (not brand-base 600): white-on-teal-600 is 3.4:1, below the
+  // 4.5:1 AA minimum. 600 remains the accent for icons/borders on white.
   primary:
-    "bg-teal-600 text-white hover:bg-teal-700 hover:shadow-md disabled:hover:bg-teal-600",
+    "bg-teal-700 text-white hover:bg-teal-800 hover:shadow-md disabled:hover:bg-teal-700",
   outline:
     "border border-navy/30 text-navy hover:border-navy hover:shadow-sm bg-transparent",
   ghost: "text-navy hover:bg-slate-100",

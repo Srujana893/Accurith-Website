@@ -125,7 +125,12 @@ export default function HomePage() {
           <p className="shrink-0 font-mono text-xs uppercase tracking-widest text-slate-500">
             Frameworks we align our delivery to
           </p>
-          <ul className="flex gap-2 overflow-x-auto md:flex-wrap">
+          {/* tabIndex: horizontally scrollable region must be keyboard-reachable */}
+          <ul
+            tabIndex={0}
+            aria-label="Framework list, scrollable"
+            className="flex gap-2 overflow-x-auto rounded-lg md:flex-wrap"
+          >
             {frameworks.map((f) => (
               <li key={f} className="shrink-0">
                 <Badge mono>{f}</Badge>

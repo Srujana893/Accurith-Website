@@ -10,7 +10,7 @@ import { submitContact } from "@/mocks/contact";
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const inputClasses =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-400 transition-colors duration-200 hover:border-slate-400";
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-500 transition-colors duration-200 hover:border-slate-400";
 
 const emptyForm = {
   name: "",
@@ -143,7 +143,7 @@ export default function ContactForm() {
             required
             value={form.service}
             onChange={update("service")}
-            className={cn(inputClasses, form.service === "" && "text-slate-400")}
+            className={cn(inputClasses, form.service === "" && "text-slate-500")}
           >
             <option value="" disabled>
               Select a service…
