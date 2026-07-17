@@ -60,6 +60,14 @@ export default function Button({
 
   if (rest.href !== undefined) {
     const { href, ...anchorProps } = rest as ButtonAsLink;
+    // Plain anchor for external/mailto targets; Next Link for internal routes.
+    if (/^(https?:|mailto:|tel:)/.test(href)) {
+      return (
+        <a href={href} className={classes} {...anchorProps}>
+          {children}
+        </a>
+      );
+    }
     return (
       <Link href={href} className={classes} {...anchorProps}>
         {children}
