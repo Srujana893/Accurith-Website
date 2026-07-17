@@ -1,28 +1,33 @@
 # CLAUDE.md — Accurith Website (Srujana Backend)
 
-Read this before editing anything. It supersedes any older CLAUDE.md in the
-tree — the earlier version was written before development started and named
-Zoho CRM as the mail path; the actual implementation is SMTP over Cloudflare
-Workers via `worker-mailer`.
+Read this before editing anything. It supersedes every other CLAUDE.md,
+AGENTS.md, README or "project knowledge" file anywhere in this repo,
+including anything under `varsha-frontend/`. Earlier files describing
+Cloudflare Pages static export, `worker-mailer`, `/functions/`, `output:
+'export'`, `public/_headers` or Zoho CRM are dead architecture. If you see
+any of that, it's stale — do not build to it.
 
 ---
 
-## 1. The one constraint that shapes everything
+## 1. What we're building and where it runs
 
-**Next.js static export → Cloudflare Pages, with Pages Functions for server code.**
+Marketing site + backend for **Accurith Technologies Private Limited**
+(Bengaluru — cyber security, IS/IT audit, risk advisory, digital forensics).
 
-- `next.config.ts` sets `output: 'export'` and `images: { unoptimized: true }`.
-- `next build` produces `/out/`. Cloudflare Pages serves it as static files.
-- **No Next.js API routes at runtime.** Anything server-side lives in
-  `/functions/` as Cloudflare Pages Functions (Workers runtime, V8 isolate,
-  NOT Node.js).
-- Node-only APIs will appear to work under `npm run dev` and fail in
-  production. If a package needs `net`, `fs`, `child_process`, or nodemailer's
-  SMTP transport at runtime, it does not belong in `/functions/`.
+**Runtime architecture (confirmed, do not propose alternatives):**
 
-**Security headers live in `/public/_headers`.** Cloudflare Pages reads that
-file at deploy time. `headers()` in `next.config.ts` does nothing under static
-export — don't put security headers there.
+- **Hosting:** Railway (Node runtime, not serverless). Cloudflare in front for
+  DNS, CDN, WAF, TLS.
+- **App:** Next.js 16, TypeScript, App Router, `src/`, Tailwind v4.
+  **`output: 'standalone'`**. Real API routes. Middleware. Per-request CSP nonce.
+- **DB:** PostgreSQL on Railway. Prisma as client + migrations.
+- **Mail:** nodemailer → SMTP → team inbox. Provider-agnostic via env vars.
+- **Pattern:** Every form writes to Postgres AND emails an alert. The row is
+  truth; the email is how we notice.
+- **Analytics:** Plausible, only after cookie consent. Never Google Analytics.
+
+**We are on a Node server.** nodemailer is the right library.
+`worker-mailer` / `cloudflare:sockets` are gone.
 
 ---
 
@@ -32,15 +37,16 @@ export — don't put security headers there.
 
 | Path | Purpose |
 |------|---------|
-| `/functions/` | All Cloudflare Pages Functions (the real API) |
-| `/src/lib/` | `mail.ts`, `metadata.ts`, `blog.ts` — build-time helpers |
+| `/prisma/` | Schema + migrations + seed |
+| `/src/app/api/` | Route handlers |
+| `/src/lib/` | db.ts, mail.ts, validation.ts, abuse.ts, metadata.ts, blog.ts |
 | `/content/blog/` | MDX posts |
-| `/public/.well-known/` | `security.txt` |
-| `/public/_headers` | Security headers (NOT `next.config.ts`) |
-| `next.config.ts` | Static-export config only |
-| `/src/app/layout.tsx` | The `metadata` export + JSON-LD injection (see §3 caveat) |
-| `.env.example`, `.dev.vars.example`, `wrangler.toml` | Config templates |
-| `src/app/sitemap.ts`, `src/app/robots.ts` | SEO build artifacts |
+| `/public/.well-known/` | security.txt |
+| `next.config.ts` | Static headers + build config |
+| `/src/middleware.ts` | Per-request CSP nonce |
+| `/src/app/layout.tsx` | Metadata export + nonce plumbing + JSON-LD (see §3) |
+| `.env.example`, Railway config | Config templates |
+| `src/app/sitemap.ts`, `src/app/robots.ts` | SEO artifacts |
 
 ### Varsha owns (stop and ask):
 
@@ -52,187 +58,177 @@ export — don't put security headers there.
 | `/src/app/**/page.tsx` | All page visuals |
 
 **Tailwind v4 note:** there is NO `tailwind.config.ts`. Tokens live in
-`globals.css` via `@theme inline { ... }`. Do not create a Tailwind config file.
+`globals.css` via `@theme inline { ... }`. Do not create a Tailwind config.
 
-### The layout.tsx caveat
+### The `layout.tsx` boundary
 
-The brief says Srujana owns "the metadata export ONLY — never the visual JSX"
-in `layout.tsx`. The JSON-LD injection had to touch the JSX (there is no
-metadata-only escape hatch for JSON-LD in Next.js App Router). The single
-`<script type="application/ld+json">` tag inside `<body>` is Srujana's; the
-`<html>` / `<body>` shell and any font wiring is Varsha's. Data lives in
-`src/lib/metadata.ts` — Varsha never has to touch it.
+Srujana touches: the `metadata` export, the `headers()` call that reads the
+CSP nonce, and the one `<script type="application/ld+json">` line. Varsha
+owns the shell (`<html>` classes, `<body>` structure, font wiring).
 
 ---
 
-## 3. Architecture
+## 3. Architecture map
 
 ```
-                             ┌──────────────────────────────────────────────┐
-Browser ──── GET / ────────► │ Cloudflare Pages CDN (serves /out/)          │
-                             │  + /public/_headers → six security headers   │
-Browser ── POST /api/contact │  + /public/.well-known/security.txt          │
-        │                    └──────────────────────────────────────────────┘
-        │                                    │
-        │                                    ▼ /api/* route → Pages Function
-        │                    ┌──────────────────────────────────────────────┐
-        └───────────────────►│ /functions/api/contact.ts (V8 isolate)       │
-                             │  - validate + honeypot + size cap            │
-                             │  - worker-mailer → cloudflare:sockets        │
-                             │  - SMTP over TLS on 587 (STARTTLS) or 465    │
-                             └──────────────────────────────────────────────┘
-                                            │
-                                            ▼
-                             ┌──────────────────────────────────────────────┐
-                             │ Provider-agnostic SMTP (Gmail / SES / Zoho…) │
-                             │ Configured only via env vars in the CF dash  │
-                             └──────────────────────────────────────────────┘
+Browser ─── HTTPS ───► Cloudflare (DNS + CDN + WAF + TLS)
+                            │
+                            ▼  proxied (grey cloud OFF for now, see §Deploy)
+                     Railway (Node + Next.js 16 standalone)
+                            │
+    ┌───────────────────────┼───────────────────────┐
+    ▼                       ▼                       ▼
+ middleware.ts        /src/app/api/*         layout.tsx / pages
+ (per-req CSP        POST /consultation      (Varsha's JSX)
+  nonce)             POST /careers/apply
+                     GET  /careers/openings
+                            │
+              ┌─────────────┴─────────────┐
+              ▼                           ▼
+       Postgres (Railway)         SMTP (env-configured)
+       Consultation               → team inbox
+       JobOpening
+       JobApplication
 ```
 
-**No database. No CMS.** Blog posts are MDX files in `/content/blog/`.
-Enquiries are email — MAIL_TO is a shared inbox.
+**No cross-instance state.** The rate limiter's in-memory Map only works
+because Railway runs one long-lived process. See §5.
 
 ---
 
 ## 4. Never-do list
 
-1. **Never** put security headers in `next.config.ts`. Static export ignores
-   them. Use `/public/_headers`.
-2. **Never** use nodemailer's SMTP transport in `/functions/`. It cannot open
-   sockets on Workers. Use `worker-mailer`.
-3. **Never** use port 25 for SMTP. Cloudflare Workers block outbound port 25.
-   Use 587 (STARTTLS) or 465 (implicit TLS).
-4. **Never** hardcode an SMTP provider hostname in code. Config comes from
-   `SMTP_HOST` env var so the provider can be swapped by editing the dashboard.
-5. **Never** put `NEXT_PUBLIC_` on a secret. That prefix inlines the value into
-   the browser bundle. SMTP credentials must not carry it.
-6. **Never** put the SMTP host in CSP `connect-src`. CSP governs the browser;
-   the SMTP connection happens inside the Worker, invisible to the browser.
-7. **Never** loosen a security header silently. If Next.js breaks under a
-   strict CSP, add `'unsafe-inline'` to `style-src` (accepted trade-off) but
-   flag any script-src change explicitly.
-8. **Never** claim a certification Accurith doesn't hold. "We align to" or
-   "we help clients achieve" — never "we are certified". Frameworks are text
-   chips, never badge images.
-9. **Never** create `tailwind.config.ts`. Tailwind v4 uses CSS-first config.
-10. **Never** edit Varsha's files. Stop and describe what you needed instead.
+1. **Never** use `output: 'export'`. That's the old static architecture.
+2. **Never** use `worker-mailer`, `cloudflare:sockets`, `/functions/`,
+   `public/_headers`, or `wrangler.toml`. All removed.
+3. **Never** put security headers only in `next.config.ts` — the CSP header
+   must come from `middleware.ts` because it carries a per-request nonce.
+   The other five headers live in `next.config.ts`.
+4. **Never** build raw SQL by string concatenation. Prisma parameterises;
+   use it.
+5. **Never** leak DB, SMTP or stack error text to the client. Log server-side,
+   return generic. An error message that names your ORM is reconnaissance.
+6. **Never** use port 25 for SMTP. Use 587 (STARTTLS) or 465 (implicit TLS).
+7. **Never** hardcode an SMTP host. Mailbox choice is not final; we swap by
+   editing env vars.
+8. **Never** put `NEXT_PUBLIC_` on anything server-side. That prefix inlines
+   the value into the browser bundle.
+9. **Never** loosen the CSP silently. If Next.js breaks, flag the trade-off.
+10. **Never** claim a certification Accurith doesn't hold. "We align to" /
+    "we help clients achieve" only. Frameworks are text chips, never seals.
+11. **Never** create `tailwind.config.ts`. Tailwind v4 uses CSS-first config.
+12. **Never** edit Varsha's files. Stop and describe what you needed.
+13. **Never** accept file uploads on the careers endpoint in this phase.
+    Applicants give links (LinkedIn / portfolio / Drive). Uploads = Phase 2.
 
 ---
 
-## 5. Rate limiting — the honest answer
+## 5. Rate limit — what's real, what isn't
 
-We do not implement in-Worker rate limiting because:
+The in-memory limiter in `src/lib/abuse.ts` is REAL for our current setup:
+Railway runs ONE Node process, a `Map<string, Bucket>` persists across
+requests. Config: 5 hits per IP per 10 minutes per bucket.
 
-- Each Pages Function invocation runs in a fresh isolate. In-memory counters
-  do not persist across invocations, and there is no cross-isolate shared
-  memory. Any counter you write will silently under-count and give false
-  security.
-- KV works but adds ~50 ms latency per request and eventual consistency means
-  a determined attacker can burst past any threshold before propagation.
-- Durable Objects work correctly (strong consistency) but cost money and are
-  overkill for a form expecting ~5 enquiries/week.
+Two failure modes it does NOT cover, documented so future-me knows:
 
-**The right answer for us is a Cloudflare WAF Rate Limiting Rule at the edge**,
-configured in the dashboard once the domain is live:
+- **Resets on deploy.** Every push zeros the counters. At 5 enquiries/week
+  that's a non-issue.
+- **Breaks under horizontal scaling.** Each replica has its own Map; an
+  attacker gets 2× the quota. If we ever scale, move to Redis (Upstash) or a
+  DB-backed limiter.
 
-- Dashboard → Security → WAF → Rate limiting rules → Create rule
-- Match: `http.request.uri.path eq "/api/contact"` AND `http.request.method eq "POST"`
-- Threshold: 5 requests per IP per 60 seconds → Block for 10 minutes
-- Free plan allows one rate-limiting rule; that's enough.
-
-The honeypot (`_hp` field) in `functions/api/contact.ts` handles automated
-bot spam. Real DDoS or credential-stuffing-shaped abuse hits the WAF layer
-before it reaches the Worker.
+The Cloudflare WAF in front of us adds another layer we do not control from
+code. If abuse becomes a problem, add a Rate Limiting rule at Cloudflare
+before adding complexity here.
 
 ---
 
-## 6. Local dev — the trap
+## 6. CSP grade — the honest ceiling
 
-`npm run dev` is Next.js dev in Node. `/functions/` doesn't run there and
-`cloudflare:sockets` doesn't exist there. `worker-mailer` will throw if
-imported. Two commands you actually need:
+We now use per-request nonces + `strict-dynamic`. Both were impossible under
+static export — this is the entire reason we moved to standalone.
 
-```bash
-# Varsha's flow (unchanged):
-npm run dev                    # Next.js dev server on :3000, hot reload
+| Scanner | Predicted | What's still between us and A+ |
+|---------|-----------|-------------------------------|
+| **SSL Labs** | **A+** (with Cloudflare TLS) | Nothing at our end — depends on the Cloudflare/Railway TLS chain. Blocker: needs custom domain live. |
+| **securityheaders.com** | **A+** | Should be clean — six headers plus a nonce'd CSP. |
+| **Mozilla Observatory** | **A / A+ (~100/100)** | Small deductions possible for `style-src 'unsafe-inline'` (Tailwind + Next inject inline styles; Observatory does not dock this the way it docks script-src). If the grade comes back short, the fix is to migrate to nonce'd styles or hash-pin them — 4–8 hrs of work. |
 
-# Srujana's flow (to test /functions/):
-npm run build && npm run pages:dev
-# → wrangler pages dev out --compatibility-date=2024-09-23 \
-#     --compatibility-flag=nodejs_compat  on :8788
-```
-
-Wrangler reads `.dev.vars` for env vars (git-ignored). Production reads from
-the Cloudflare Pages dashboard → Settings → Environment variables.
-
-**Compatibility settings verified working with worker-mailer 1.2.1:**
-`compatibility_date = "2024-09-23"`, `compatibility_flags = ["nodejs_compat"]`.
-Set in `wrangler.toml`. Do not change without re-running the curl test.
+The critical piece: **`script-src` NEVER contains `'unsafe-inline'`.** That's
+where Observatory hurts most. We use `'nonce-<random>' 'strict-dynamic'`
+instead — safe and modern.
 
 ---
 
-## 7. CSP grade — the honest ceiling
+## 7. Submission contracts (J01 with Varsha)
 
-The current CSP includes `'unsafe-inline'` in `script-src` because Next.js
-App Router emits inline hydration scripts. Consequence:
-
-| Scanner | Current grade | Ceiling as configured |
-|---------|--------------|------------------------|
-| securityheaders.com | A | A+ (green across the board — they don't dock for unsafe-inline) |
-| Mozilla Observatory | B+ (~80/100) | B+ — Observatory deducts 20 points for unsafe-inline in script-src |
-| SSL Labs | A+ | A+ (TLS handled by Cloudflare, not us) |
-
-To reach A+ on Observatory: implement per-request script nonces via a
-Cloudflare Worker middleware that rewrites the HTML before it leaves the
-edge, OR pre-compute hashes of every inline script Next.js emits and pin
-those in the CSP. Either is 1–2 days of work plus test coverage. Deferred
-until we have client sign-off that the grade matters more than the effort.
-
----
-
-## 8. Contact API contract (J01)
-
-`POST /api/contact` with `Content-Type: application/json`.
-
+### `POST /api/consultation`
 ```jsonc
-// Request body
 {
-  "name": "string, 1-200 chars, no CR/LF",
-  "email": "string, valid email",
-  "company": "string, 1-200 chars",
-  "role": "string, 1-200 chars",
-  "service": "string, 1-200 chars",
-  "message": "string, 1-5000 chars",
-  "_hp": ""    // honeypot — MUST be empty; hidden field in Varsha's form
+  "name":     "string, 1–200",
+  "email":    "email, ≤254",
+  "company":  "string, 1–200",
+  "role":     "string, 1–200",
+  "service":  "string, 1–200",
+  "message":  "string, 1–5000",
+  "website":  ""     // honeypot — MUST be empty; hidden in Varsha's form
 }
-
-// Response 200
-{ "success": true }
-
-// Response 4xx / 5xx
-{ "success": false, "error": "<generic client-safe message>" }
 ```
+Response 200 `{ "success": true }` on happy path OR honeypot triggered.
+Response 400 / 413 / 415 / 429 / 500 with `{ "success": false, "error": "…" }`.
 
-Status codes: 200 OK, 400 Bad Request, 405 Method Not Allowed, 413 Payload
-Too Large, 415 Unsupported Media Type, 500 Server config error, 502 Mail
-send failed.
+### `POST /api/careers/apply`
+```jsonc
+{
+  "openingId":    "string (from GET openings)",
+  "name":         "string",
+  "email":        "email",
+  "phone":        "digits + separators, 6–20",
+  "linkedinUrl":  "http(s) URL",
+  "portfolioUrl": "http(s) URL, optional",
+  "coverNote":    "string, 1–5000",
+  "website":      ""     // honeypot
+}
+```
+404 if `openingId` unknown or `isOpen: false` (indistinguishable on purpose).
 
-Never displays raw SMTP or stack errors to the client. Everything logs
-server-side (visible via `wrangler tail` locally or the Cloudflare dashboard's
-function logs in production).
+### `GET /api/careers/openings`
+Returns `{ openings: [ { id, slug, title, department, location, employmentType, descriptionMd, postedAt } ] }`. `isOpen = true` only. Cached 60s public.
+
+---
+
+## 8. Privacy — open questions (S23 territory)
+
+We now store personal data. **These are decisions for the client, not me:**
+
+- **Retention** — how long do rows live before hard-delete? Placeholder:
+  `{{RETENTION_PERIOD}}`. My default suggestion: 24 months for consultations,
+  36 months for applications (both align to a routine audit cycle).
+- **Right to erasure (DPDP 2023 §12; GDPR Art. 17)** — a data subject can
+  ask us to delete their record. Prototype answer: **manual SQL via Railway
+  Postgres dashboard**, triggered by a request to `privacy@accurith.com`.
+  Say so on the page.
+- **Data residency** — Railway has no India region; the nearest is
+  **Singapore**. Applicant and enquirer personal data will sit in Singapore.
+  DPDP allows cross-border transfer unless the government publishes a
+  negative list (§16 read with §17). Confirm with counsel; if residency
+  becomes binding, we replatform to AWS ap-south-1 / a domestic cloud.
+- **Privacy Policy rewrite** — the pre-Phase-1 draft says "we email
+  enquiries and store nothing." That is now false and it's S23. Do not
+  publish anything trust-facing until it's updated.
 
 ---
 
 ## 9. Two-directory reality check
 
-Right now the repo has two sibling Next.js scaffolds:
+Repo still has two sibling scaffolds:
 
-- `Srujana Backend/` — this project (Srujana's ownership, contains functions/)
-- `varsha-frontend/` — Varsha's scaffold on branch `feature/varsha-frontend`
+- `Srujana Backend/` — this project (canonical: DB, API, security, CSP,
+  Prisma, nodemailer)
+- `varsha-frontend/` — Varsha's separate scaffold (own next.config, own
+  package.json, own CLAUDE.md that still describes the static architecture)
 
-Cloudflare Pages Functions must sit next to the built `/out/`, so eventually
-these must merge into ONE project. Suggested merge direction: Varsha's
-components + pages fold INTO this project (which already has the functions/,
-_headers, security.txt, wrangler.toml, MDX pipeline). That merge is not done
-yet — flag it before either developer starts deep dependency work that will
-be re-done post-merge.
+They must merge before ship. Direction: pull Varsha's `/src/components/`,
+her `page.tsx` files, her `globals.css`, and her brand assets INTO this
+project. Everything infrastructural is here. Flag the merge day so we don't
+each spend a week diverging further.

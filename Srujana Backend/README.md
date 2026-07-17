@@ -1,11 +1,20 @@
 # Accurith Website
 
-Marketing site for **Accurith Technologies Private Limited** (Bengaluru).
-Cybersecurity, IS/IT audit, risk advisory and digital forensics.
+Marketing + backend for **Accurith Technologies Private Limited** (Bengaluru).
+Cyber security, IS/IT audit, risk advisory, digital forensics.
 
-Read `CLAUDE.md` first — it explains the architecture (static export +
-Cloudflare Pages Functions) and the ownership boundaries between Varsha
-(frontend) and Srujana (backend/security/infra).
+Read **`CLAUDE.md`** first — it explains the architecture, ownership
+boundaries, and privacy open questions.
+
+---
+
+## Stack
+
+- **Next.js 16** with `output: 'standalone'` — TS, App Router, Tailwind v4
+- **Postgres** on Railway, **Prisma** as client + migrations
+- **nodemailer** → SMTP → team inbox
+- **Cloudflare** in front of Railway for DNS + WAF + TLS
+- **Per-request CSP nonces** via `src/middleware.ts` for an A-grade CSP
 
 ---
 
@@ -15,241 +24,285 @@ Cloudflare Pages Functions) and the ownership boundaries between Varsha
 
 - Node.js ≥ 20 (tested on 25.8.1)
 - npm ≥ 10
+- Docker (for a local Postgres)
 
-### Install
+### First-time setup
 
 ```bash
 npm install
 cp .env.example .env.local
-cp .dev.vars.example .dev.vars
+# then edit .env.local — set DATABASE_URL, SMTP_*, MAIL_TO
 ```
 
-Then fill in the values in `.env.local` and `.dev.vars`. Neither file is
-committed — both are in `.gitignore`.
-
-### Two dev servers, two purposes
-
-**1. Frontend hot-reload (Varsha, and Srujana editing lib/):**
+**Start a local Postgres (Docker):**
 
 ```bash
-npm run dev
+docker run -d --name accurith-pg \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=accurith \
+  -p 5433:5432 postgres:16-alpine
 ```
 
-Serves on http://localhost:3000 with hot reload. `/functions/` does NOT run
-here — the `/api/contact` endpoint will 404. Any code in `/functions/` that
-imports `worker-mailer` will throw when reached.
+Then in `.env.local`:
 
-**2. Full stack over the Workers runtime (Srujana, testing /api/*):**
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/accurith
+```
+
+**Apply migrations and seed sample job openings:**
 
 ```bash
-npm run build
-npm run pages:dev
+npm run db:migrate       # applies pending migrations + regenerates client
+npm run db:seed          # inserts 3 sample job openings
+npm run db:studio        # optional — GUI for browsing/editing rows
 ```
 
-Serves on http://127.0.0.1:8788. Real Cloudflare Workers runtime. Reads
-`.dev.vars`. `/api/contact` works here. No hot reload — re-run `npm run build`
-after code changes.
-
-### Optional one-time git hook setup
-
-Husky lives in this subdirectory. To make it fire from this project only:
+### Run the app
 
 ```bash
-git config --local core.hooksPath "Srujana Backend/.husky"
+npm run dev              # Next.js dev on :3000 (hot reload, uses .env.local)
 ```
 
-Run this from the repo root. Skip it if the repo eventually collapses to a
-single project directory (see CLAUDE.md §9).
+Or, to mirror production exactly:
+
+```bash
+npm run build && npm start   # standalone build served by `next start`
+```
 
 ---
 
-## Testing the contact endpoint locally
+## Testing the endpoints
 
-With `npm run pages:dev` running:
+With the app running and a real (or fake) SMTP in `.env.local`:
 
 ```bash
-# 1. Method not allowed (405)
-curl -i http://127.0.0.1:8788/api/contact
+# --- GET a real openingId to use below -----------------------------------
+OPENING_ID=$(curl -s http://127.0.0.1:3000/api/careers/openings \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['openings'][0]['id'])")
+echo $OPENING_ID
 
-# 2. Missing content-type (415)
-curl -i -X POST http://127.0.0.1:8788/api/contact -d '{}'
+# --- 1. Consultation, happy path -----------------------------------------
+curl -i -X POST http://127.0.0.1:3000/api/consultation \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Test","email":"t@example.com","company":"Acme","role":"CTO",
+       "service":"Cyber security","message":"Hello."}'
+# → HTTP 200 {"success":true}   (row saved in Consultation)
 
-# 3. Missing fields (400)
-curl -i -X POST http://127.0.0.1:8788/api/contact \
+# --- 2. Consultation, bad payload ----------------------------------------
+curl -i -X POST http://127.0.0.1:3000/api/consultation \
   -H 'Content-Type: application/json' -d '{}'
+# → HTTP 400 {"success":false,"error":"Please check the form and try again."}
 
-# 4. Invalid email (400)
-curl -i -X POST http://127.0.0.1:8788/api/contact \
+# --- 3. Consultation, honeypot filled ------------------------------------
+curl -i -X POST http://127.0.0.1:3000/api/consultation \
   -H 'Content-Type: application/json' \
-  -d '{"name":"S","email":"bad","company":"C","role":"R","service":"X","message":"m"}'
+  -d '{"name":"S","email":"s@s.com","company":"C","role":"R","service":"X",
+       "message":"m","website":"bot"}'
+# → HTTP 200 {"success":true}   (dropped silently, no row written)
 
-# 5. Honeypot triggered (200, silently dropped)
-curl -i -X POST http://127.0.0.1:8788/api/contact \
+# --- 4. Application, happy path ------------------------------------------
+curl -i -X POST http://127.0.0.1:3000/api/careers/apply \
   -H 'Content-Type: application/json' \
-  -d '{"name":"S","email":"s@s.com","company":"C","role":"R","service":"X","message":"m","_hp":"bot"}'
+  -d "{\"openingId\":\"$OPENING_ID\",\"name\":\"Applicant\",\"email\":\"a@ex.com\",
+       \"phone\":\"+91 98765 43210\",\"linkedinUrl\":\"https://linkedin.com/in/x\",
+       \"coverNote\":\"Interested\"}"
+# → HTTP 200 {"success":true}
 
-# 6. Valid — will attempt real SMTP send. With .dev.vars pointing at a fake
-#    host (SMTP_HOST=smtp.invalid) you get 502 "Could not send your message."
-#    With real creds you get 200 and an email arrives at MAIL_TO.
-curl -i -X POST http://127.0.0.1:8788/api/contact \
+# --- 5. Application to a bogus opening -----------------------------------
+curl -i -X POST http://127.0.0.1:3000/api/careers/apply \
   -H 'Content-Type: application/json' \
-  -d '{"name":"Test","email":"test@example.com","company":"Acme","role":"CTO","service":"Cyber security","message":"Hello."}'
+  -d '{"openingId":"nope","name":"A","email":"a@ex.com","phone":"+911",
+       "linkedinUrl":"https://linkedin.com/in/x","coverNote":"Y"}'
+# → HTTP 404 {"success":false,"error":"This role is no longer accepting applications."}
+
+# --- 6. Application with javascript: URL (should reject) -----------------
+curl -i -X POST http://127.0.0.1:3000/api/careers/apply \
+  -H 'Content-Type: application/json' \
+  -d "{\"openingId\":\"$OPENING_ID\",\"name\":\"A\",\"email\":\"a@ex.com\",
+       \"phone\":\"+911\",\"linkedinUrl\":\"javascript:alert(1)\",
+       \"coverNote\":\"Y\"}"
+# → HTTP 400 {"success":false,"error":"Please check the form and try again."}
+
+# --- 7. Rate limit — 6 identical enquiries from the same IP --------------
+for i in 1 2 3 4 5 6; do
+  curl -s -o /dev/null -w "$i=%{http_code} " -X POST http://127.0.0.1:3000/api/consultation \
+    -H 'Content-Type: application/json' \
+    -d "{\"name\":\"S$i\",\"email\":\"s$i@ex.com\",\"company\":\"C\",
+         \"role\":\"R\",\"service\":\"X\",\"message\":\"m\"}"; done; echo
+# → 1=200 2=200 3=200 4=200 5=200 6=429   (429 = Too Many Requests)
 ```
 
-Expected success:
+**With a fake SMTP host** (e.g. `SMTP_HOST=smtp.invalid`): the DB row IS
+written, the mail send fails, we log the error server-side, and the client
+still gets `200 {"success":true}` — by design, so a mail hiccup does not
+lose the enquiry.
 
-```
-HTTP/1.1 200 OK
-Content-Type: application/json; charset=utf-8
-Cache-Control: no-store
-{"success":true}
-```
+**Verify a row landed:**
 
-Expected failure (fake SMTP):
-
-```
-HTTP/1.1 502 Bad Gateway
-Content-Type: application/json; charset=utf-8
-{"success":false,"error":"Could not send your message. Please try again shortly."}
+```bash
+docker exec accurith-pg psql -U postgres -d accurith \
+  -c 'SELECT id, email, service, "createdAt" FROM "Consultation" ORDER BY "createdAt" DESC LIMIT 5;'
 ```
 
-The real SMTP error is logged in the wrangler terminal — it never reaches the
-client.
+---
+
+## Adding a job opening
+
+Two ways:
+
+1. **Locally, via Prisma Studio (GUI):**
+
+   ```bash
+   npm run db:studio
+   ```
+
+   Then edit `JobOpening` rows in the browser.
+
+2. **On Railway, via the Postgres data tab:** click the plugin, "Data",
+   `JobOpening`, add row.
+
+Required fields: `slug` (URL-safe, unique), `title`, `department`, `location`,
+`employmentType`, `descriptionMd` (Markdown). `isOpen: true` to show it on
+the careers page.
 
 ---
 
 ## Adding a blog post
 
-1. Create `content/blog/<slug>.mdx`.
-2. Frontmatter (all required unless noted):
+Create `content/blog/<slug>.mdx`:
 
 ```mdx
 ---
-title: 'Your title here'
+title: 'Your title'
 date: '2026-07-17'
 author: 'Your Name'
 tags: ['optional', 'tags']
-excerpt: 'One sentence, ~160 chars, shown on the /resources/blog list.'
-draft: false   # set to true to hide from the sitemap and list
+excerpt: 'One sentence, ~160 chars.'
+draft: false      # true hides from the blog list + sitemap
 ---
 
 Your MDX body. Standard Markdown plus any React components Varsha exposes.
 ```
 
-3. `npm run build` — the sitemap regenerates automatically.
-
-The pipeline (in `src/lib/blog.ts`) will throw at build time if any required
-frontmatter field is missing. That's intentional — a broken post should fail
-the build, not render `undefined`.
+The pipeline (`src/lib/blog.ts`) throws at build time if any required
+frontmatter field is missing.
 
 ---
 
-## Deploying
+## Deploy — Railway
 
-Cloudflare Pages, connected to GitHub. Every push to `main` triggers a
-production build; every push to `staging` (or `feature/*`) triggers a
-preview deploy.
+### One-time project setup
 
-**Build settings (Cloudflare dashboard):**
+1. Create a new Railway project.
+2. Add the **Postgres** plugin. Railway injects `${{Postgres.DATABASE_URL}}`.
+3. Add this repo as a service. Set:
+   - **Root directory:** `Srujana Backend` (until the two scaffolds merge).
+   - **Build command:** `npm ci && npx prisma generate && npm run build`
+   - **Start command:** `npx prisma migrate deploy && node .next/standalone/server.js`
+   - **Healthcheck path:** `/robots.txt` (200 OK, no DB required)
+4. **Variables** tab — paste:
 
-```
-Framework preset:      Next.js (Static HTML Export)
-Build command:         npm run build
-Build output dir:      out
-Root directory:        Srujana Backend        # while the repo has this subdir
-Node version:          20
-```
+   | Var | Value | Notes |
+   |-----|-------|-------|
+   | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` | Reference the plugin, don't paste raw |
+   | `NEXT_PUBLIC_SITE_URL` | `https://accurith.com` | |
+   | `SMTP_HOST` | e.g. `smtp.gmail.com` | Provider-agnostic |
+   | `SMTP_PORT` | `465` or `587` | Never 25 |
+   | `SMTP_USER` | full mailbox address | |
+   | `SMTP_PASS` | app password | **Mark as sealed/private** |
+   | `MAIL_TO` | shared inbox | |
 
-**Environment variables (Cloudflare dashboard → Settings → Environment):**
+5. Deploy. Watch logs — first deploy runs migrations automatically via the
+   start command.
 
-| Var | Value example | Mark as encrypted? |
-|-----|---------------|---------------------|
-| `NEXT_PUBLIC_SITE_URL` | `https://accurith.com` | No |
-| `SMTP_HOST` | `smtp.gmail.com` | No |
-| `SMTP_PORT` | `465` | No |
-| `SMTP_USER` | `hello@accurith.com` | No |
-| `SMTP_PASS` | (app password) | **Yes** |
-| `MAIL_TO` | `hello@accurith.com` | No |
+### Cloudflare DNS
 
-Add them for both Production and Preview environments.
+1. Add `accurith.com` in Cloudflare.
+2. Point `A` / `CNAME` records at Railway's provided domain
+   (`<project>.up.railway.app`).
+3. **Grey-cloud (DNS-only) at first** so Railway's cert issues cleanly.
+4. Once TLS is verified, **flip to orange cloud (proxied)**. Cloudflare
+   now handles CDN + WAF + DDoS.
+5. Add Rate Limiting rules on `/api/consultation` and `/api/careers/apply`
+   (5 req / IP / min → block 10 min).
 
-**Post-deploy checks (do these once after the first deploy):**
+### Post-deploy checks
 
-- `curl -I https://accurith.com/` — verify all six security headers present.
-- `curl https://accurith.com/.well-known/security.txt` — should return the file as `text/plain`.
-- `curl https://accurith.com/sitemap.xml` — should list all routes.
-- Rich Results Test (search.google.com/test/rich-results) — Organization schema should be recognized.
-- SSL Labs (ssllabs.com/ssltest/) — expected A+.
-- securityheaders.com — expected A (see CLAUDE.md §7 on the A→A+ path).
-- Mozilla Observatory (observatory.mozilla.org) — expected B+ (~80/100).
+- `curl -I https://accurith.com/` → all six security headers present.
+- `curl https://accurith.com/.well-known/security.txt` → text/plain, RFC 9116.
+- `curl https://accurith.com/api/careers/openings` → JSON list.
+- SSL Labs, securityheaders.com, Mozilla Observatory. Grades expected:
+  A+ / A+ / A–A+ (see CLAUDE.md §6 for detail).
 
 ---
 
 ## Env var reference
 
-See `.env.example` and `.dev.vars.example` for the annotated versions.
-Quick summary:
+Every variable is annotated in `.env.example`. Quick summary:
 
-- **`.env.local`** (build time, browser-visible if prefixed with `NEXT_PUBLIC_`):
-  `NEXT_PUBLIC_SITE_URL`
-- **`.dev.vars`** (runtime, Worker only, never sent to browser):
-  `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_TO`
+| Var | Where set | Purpose |
+|-----|-----------|---------|
+| `DATABASE_URL` | Railway plugin auto, or local `.env.local` | Postgres connection string |
+| `NEXT_PUBLIC_SITE_URL` | Railway + `.env.local` | Public site origin (canonical, OG, sitemap) |
+| `SMTP_HOST` | Railway + `.env.local` | SMTP server hostname |
+| `SMTP_PORT` | Railway + `.env.local` | 465 (implicit TLS) or 587 (STARTTLS) |
+| `SMTP_USER` | Railway + `.env.local` | SMTP auth user (usually a full email) |
+| `SMTP_PASS` | Railway + `.env.local` | SMTP auth password (mark sealed in Railway) |
+| `MAIL_TO` | Railway + `.env.local` | Team inbox for alerts |
 
-`.env*` and `.dev.vars` are git-ignored. `.example` files are committed.
+`.env.local` is git-ignored. `.env.example` is committed.
 
 ---
 
 ## Troubleshooting
 
-**"cloudflare:sockets not found" during `npm run dev`.**
-Expected. `npm run dev` uses Node; `worker-mailer` needs the Workers runtime.
-Test the endpoint via `npm run pages:dev` instead.
+**`Environment variable not found: DATABASE_URL` during a Prisma command.**
+Prisma reads `.env`, not `.env.local`, by default. Either duplicate the value
+into `.env`, or prefix the command: `DATABASE_URL="..." npx prisma ...`.
 
-**Build fails with "export const dynamic … not configured".**
-Something in `src/app/` returned a dynamic route handler. Static export
-requires every handler to declare `export const dynamic = 'force-static'`.
-Both `sitemap.ts` and `robots.ts` already do this.
+**Route returns 200 in prod but no row in DB.**
+Look at Railway logs. Two paths: (a) honeypot triggered — legitimate silent-drop;
+(b) DB insert failed and returned 500 — logs will say `db insert failed`.
 
-**Contact form returns 502 with a fake SMTP host.**
-That is the expected failure path — the endpoint tried to open a socket to
-`smtp.invalid` and failed. Point `.dev.vars` at real credentials to send.
+**Route returns 200 but no email arrived.**
+By design. Mail send is best-effort — if it fails after the DB save, we log
+loudly (`mail send failed (record saved)`) and still return success. Check
+Railway logs, fix SMTP creds, catch up manually.
 
-**`npm run build` succeeds but `/out/` has no `_headers` file.**
-`/out/_headers` is Cloudflare Pages' contract — it's copied from
-`/public/_headers` by the build. If it's missing, check `/public/_headers`
-was not accidentally moved or renamed.
+**Rate-limit resets after every deploy.**
+Yes, expected. In-memory counter. See CLAUDE.md §5.
 
-**Wrangler complains about a "space" in the path.**
-The repo currently has `Srujana Backend/` (with a space) as the working
-directory. Wrangler handles it internally, but scripts that shell out to
-other tools may not. If you hit this, either rename the directory (git mv)
-or run commands with the path quoted: `cd "Srujana Backend"`.
+**CSP blocks something Varsha added.**
+Add a nonce, or move the resource to a first-party path. Do NOT add
+`'unsafe-inline'` to `script-src` — that regresses our Observatory grade.
+Look at `src/middleware.ts` for the current allowlist.
+
+**Path has a space (`Srujana Backend/`).**
+Live with it or `git mv "Srujana Backend" srujana-backend`. Every tool quotes
+paths internally but shell one-liners need care.
 
 ---
 
 ## Where things live
 
 ```
-├── content/blog/            Srujana — MDX posts
-├── functions/api/           Srujana — Pages Functions (server code)
-├── public/
-│   ├── _headers             Srujana — security headers
-│   ├── .well-known/         Srujana — security.txt
-│   ├── images/              Varsha — brand assets
-│   └── icons/               Varsha — brand assets
+├── content/blog/              Srujana — MDX posts
+├── prisma/                    Srujana — schema, migrations, seed
+├── public/.well-known/        Srujana — security.txt
+├── public/images/, icons/     Varsha  — brand assets
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx       Shared (Srujana: metadata; Varsha: JSX shell)
-│   │   ├── globals.css      Varsha — Tailwind v4 tokens
-│   │   ├── page.tsx         Varsha — all pages
-│   │   ├── sitemap.ts       Srujana
-│   │   └── robots.ts        Srujana
-│   ├── components/          Varsha — all React UI
-│   └── lib/                 Srujana — metadata.ts, blog.ts, mail.ts
-├── .env.example             Srujana — committed template
-├── .dev.vars.example        Srujana — committed template
-├── next.config.ts           Srujana — static export config
-├── wrangler.toml            Srujana — Pages/Workers config
-├── CLAUDE.md                Read first
-└── TASKS.md                 S01–S30 tracker
+│   │   ├── layout.tsx         Shared (Srujana: metadata + nonce; Varsha: JSX)
+│   │   ├── globals.css        Varsha — Tailwind v4 tokens
+│   │   ├── page.tsx           Varsha — all pages
+│   │   ├── api/               Srujana — route handlers
+│   │   ├── sitemap.ts         Srujana
+│   │   └── robots.ts          Srujana
+│   ├── components/            Varsha — all React UI
+│   ├── lib/                   Srujana — db, mail, validation, abuse, metadata, blog
+│   └── middleware.ts          Srujana — per-request CSP nonce
+├── .env.example               Srujana — committed template
+├── next.config.ts             Srujana — standalone build + static headers
+├── CLAUDE.md                  Read first
+└── TASKS.md                   S01–S30 tracker
 ```

@@ -1,92 +1,95 @@
-# TASKS — Srujana track (S01–S30)
+# TASKS — Srujana track
 
-Status legend: ✅ done · 🟡 in progress · ⬜ pending · ⚫ blocked (see notes)
+Status legend: ✅ done · 🟡 in progress · ⬜ pending · ⚫ blocked
 
 ## Monday — Setup
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S01 | P0 | GitHub repo + branch protection (main, staging, feat/*) | ⚫ | Requires Accurith GitHub org access — client action |
-| S02 | P0 | Next.js 16 scaffold, TS, ESLint, Tailwind v4, App Router, src/, `@/*`, `output: 'export'`, `images.unoptimized`, `/out` verified | ✅ | |
-| S03 | P0 | ESLint + Prettier + Husky + lint-staged | ✅ | `.husky/pre-commit` created; devs must run `git config core.hooksPath ".husky"` locally once (see README) |
-| S04 | P0 | Security headers in `public/_headers` (HSTS, CSP, XFO, XCTO, Referrer, Permissions, COOP) | ✅ | See CLAUDE.md §7 for grade honesty |
-| S05 | P1 | Cloudflare Pages project + custom domain | ⚫ | Requires Cloudflare + DNS access — Srujana dashboard action |
-| S06 | P1 | `security.txt` at `/.well-known/` (RFC 9116) | ✅ | Expires 2027-07-17 |
-| S07 | P0 | `.env.example` + `.dev.vars.example`, all vars commented, `.gitignore` covers | ✅ | |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S01 | P0 | GitHub repo + branch protection | ⚫ (Accurith org access, client action) |
+| S02 | P0 | Next.js 16 scaffold, TS, Tailwind v4, App Router, `src/`, `output:'standalone'`, build verified | ✅ |
+| S03 | P0 | ESLint + Prettier + Husky + lint-staged | ✅ |
+| S04 | P0 | Security headers in `next.config.ts` (5) + CSP nonce in `middleware.ts` (6th) | ✅ |
+| S05 | P0 | Railway project + Postgres provisioned | ⚫ (Railway account, Srujana action) |
+| S06 | P1 | `security.txt` at `/.well-known/` (RFC 9116) | ✅ |
+| S07 | P0 | `.env.example` with every var commented; `.gitignore` covers `.env*.local` | ✅ |
 
 ## Tuesday — Backend + SEO
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S08 | P0 | `functions/api/contact.ts` — POST, validate, worker-mailer, honeypot, generic errors | ✅ | Rate limit via Cloudflare WAF — not in code, see CLAUDE.md §5 |
-| S09 | P1 | Consent-mode cookie banner scaffolding | ⬜ | Blocked on Varsha's UI component |
-| S10 | P1 | Plausible or Umami analytics loader (post-consent) | ⬜ | Analytics account not yet created — Srujana action |
-| S11 | P0 | MDX pipeline: `next-mdx-remote` + `gray-matter`, `src/lib/blog.ts` | ✅ | |
-| S12 | P0 | Sample MDX post with real frontmatter | ✅ | `content/blog/why-your-site-headers-are-your-first-security-signal.mdx` |
-| S13 | P0 | `src/lib/metadata.ts` — `createMetadata()` helper | ✅ | |
-| S14 | P0 | Organization JSON-LD in root layout + `sitemap.ts` + `robots.ts` | ✅ | Bengaluru address baked in |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S08a | P0 | Prisma schema — Consultation, JobOpening, JobApplication | ✅ |
+| S08b | P0 | `src/lib/db.ts` (Prisma singleton) | ✅ |
+| S08c | P0 | Initial migration + seed 3 sample openings | ✅ (verified end-to-end against docker Postgres) |
+| S08d | P0 | `src/lib/validation.ts` (zod schemas for both routes) | ✅ |
+| S08e | P0 | `src/lib/mail.ts` (nodemailer, provider-agnostic) | ✅ |
+| S08f | P0 | `src/lib/abuse.ts` (IP + honeypot + rate limit) | ✅ |
+| S08g | P0 | `POST /api/consultation` | ✅ |
+| S08h | P0 | `POST /api/careers/apply` + `GET /api/careers/openings` | ✅ |
+| S09  | P1 | Consent-mode cookie banner scaffolding | ⬜ (blocked on Varsha's UI component) |
+| S10  | P1 | Plausible analytics loader (post-consent) | ⬜ (no Plausible account yet — Srujana action) |
+| S11  | P0 | MDX pipeline: `next-mdx-remote` + `gray-matter`, `src/lib/blog.ts` | ✅ |
+| S12  | P0 | Sample MDX post | ✅ |
+| S13  | P0 | `src/lib/metadata.ts` — `createMetadata()` helper | ✅ |
+| S14  | P0 | Organization JSON-LD in root layout + `sitemap.ts` + `robots.ts` | ✅ |
 
 ## Wednesday — Wiring
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S15 | P1 | Wire contact form to `/api/contact` | ⬜ | Blocked on Varsha's `<ContactForm>` |
-| S16 | P1 | Add `createMetadata()` call to every page | ⬜ | Blocked on Varsha's page.tsx files |
-| S17 | P2 | Wire `getAllPosts()` into `/resources/blog` | ⬜ | Blocked on Varsha's `BlogCard`, `BlogPostLayout` |
-| S18 | P2 | Trust & Security page copy (technical sections) | ⬜ | |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S15 | P1 | Wire consultation form → `/api/consultation` | ⬜ (blocked on Varsha's `<ContactForm>`) |
+| S16 | P1 | Call `createMetadata()` from every `page.tsx` | ⬜ (blocked on Varsha's page.tsx files) |
+| S17 | P2 | `/resources/blog` reads `getAllPosts()` | ⬜ (blocked on Varsha's `BlogCard`, `BlogPostLayout`) |
+| S18 | P1 | Wire careers form → `/api/careers/apply` and openings list → `/api/careers/openings` | ⬜ (blocked on Varsha's `<CareersList>`, `<ApplyForm>`) |
+| S19 | P2 | Trust & Security page technical copy | ⬜ |
 
 ## Thursday — Legal + polish
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S19 | P1 | Legal page drafts (Privacy, Terms, Cookies, DPA) — "pending counsel review" banner | ⬜ | |
-| S20 | P2 | Report-a-vulnerability page copy | ⬜ | |
-| S21 | P2 | 404 page copy (pass to Varsha for layout) | ⬜ | |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S20 | P1 | Legal drafts (Privacy, Terms, Cookies, DPA) with "pending counsel" banner | ⬜ |
+| S21 | P2 | Report-a-vulnerability page copy | ⬜ |
+| S22 | P2 | 404 copy (Varsha lays out) | ⬜ |
+| S23 | **P0** | **Privacy Policy — rewrite to reflect we now store personal data** | ⬜ (SEE CLAUDE.md §8) |
 
 ## Friday — Ship prep
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S22 | P0 | Cloudflare WAF rate-limit rule on `/api/contact` | ⚫ | Requires production Cloudflare Pages project — dashboard action |
-| S23 | P0 | Production env vars in Cloudflare dashboard (SMTP_*, MAIL_TO, NEXT_PUBLIC_SITE_URL) | ⚫ | Requires the SMTP mailbox to be chosen — client / Srujana action |
-| S24 | P0 | Final security scan pass (SSL Labs / securityheaders / Observatory) | ⬜ | Run after DNS is live |
-| S25 | P1 | Verify `security.txt` accessible on production | ⬜ | Post-deploy check |
-| S26 | P1 | Verify sitemap submitted to Search Console | ⬜ | Post-DNS |
-| S27 | P2 | Verify Organization JSON-LD in Rich Results Test | ⬜ | Post-deploy |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S24 | P0 | Cloudflare WAF rate-limit on `/api/consultation` and `/api/careers/apply` | ⚫ (needs prod project) |
+| S25 | P0 | Populate Railway env vars: `DATABASE_URL` (auto), SMTP_*, MAIL_TO, `NEXT_PUBLIC_SITE_URL` | ⚫ (SMTP mailbox not chosen) |
+| S26 | P0 | Final scanner pass (SSL Labs / securityheaders / Observatory) | ⬜ (post-DNS) |
+| S27 | P1 | Verify `security.txt` accessible on production | ⬜ |
+| S28 | P1 | Submit sitemap to Google Search Console | ⬜ |
+| S29 | P2 | Rich Results Test for Organization JSON-LD | ⬜ |
 
 ## Saturday — Launch
 
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S28 | P0 | Merge to main, tag release | ⬜ | |
-| S29 | P0 | Prod smoke test: contact form end-to-end | ⬜ | |
-
-## Sunday — Handover
-
-| ID  | Priority | Task | Status | Notes |
-|-----|----------|------|--------|-------|
-| S30 | P1 | Runbook + handover doc | ⬜ | |
+| ID  | P | Task | Status |
+|-----|---|------|--------|
+| S30 | P0 | Merge to `main`, tag release, prod smoke test | ⬜ |
 
 ---
 
-## Blocked-on-Varsha inventory
+## Blocked on Varsha
 
-Anything Srujana can't finish because it needs a component or a page that
-Varsha owns. Flag these in the daily 10-min standup.
+Contract to share with her at the standup:
 
-- S15: `<ContactForm>` component that POSTs to `/api/contact` with the honeypot
-       field `_hp` hidden via CSS/aria-hidden.
-- S16: Page files that import and call `createMetadata()` from `@/lib/metadata`.
-- S17: `<BlogCard>` (list view) and `<BlogPostLayout>` (post view) components,
-       plus `/src/app/resources/blog/page.tsx` and
-       `/src/app/resources/blog/[slug]/page.tsx` route files.
+- `<ContactForm>` posts to `/api/consultation` with the hidden honeypot
+  field named `website`.
+- `<ApplyForm>` posts to `/api/careers/apply` with `openingId` from the
+  `GET /api/careers/openings` list, plus honeypot `website`.
+- Every `page.tsx` imports `createMetadata` from `@/lib/metadata`.
 
-## Blocked-on-client-or-dashboard inventory
+## Blocked on client / dashboard / DNS
 
-Things Srujana cannot finish from the laptop alone.
-
-- S01: GitHub Accurith org access + repo creation.
-- S05: Cloudflare Pages project + DNS at the registrar.
-- S22: WAF rate-limit rule (needs the production project to exist).
-- S23: SMTP mailbox choice + app password + populating Cloudflare env vars.
-- Leadership bios/credentials, service copy, brand asset confirmation.
+- **GitHub** — Accurith org, create repo, branch protection on `main`.
+- **Railway** — create project, add Postgres plugin, deploy this branch,
+  paste SMTP env vars.
+- **Cloudflare** — DNS to Railway's custom domain, DNS-only (grey cloud)
+  during first-boot, then flip to proxied (orange cloud) after WAF rules.
+- **SMTP mailbox** — pick provider (Gmail Workspace / SES / Zoho / etc.),
+  generate app password if 2FA'd, populate Railway env vars.
+- **Client decision** — retention period, residency (Singapore vs. India),
+  legal sign-off on Privacy Policy rewrite (S23).
+- **Leadership bios/credentials, service substance notes, brand asset lock.**

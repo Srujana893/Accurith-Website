@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { organizationJsonLd, SITE_NAME, SITE_URL } from '@/lib/metadata';
 import './globals.css';
@@ -42,18 +43,23 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read the per-request nonce that middleware.ts set. Every inline script we
+  // emit must carry this nonce, otherwise the CSP will block it.
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        {/* Organization JSON-LD for Google rich results. Data source lives in
+        {/* Organization JSON-LD for Google rich results. Data lives in
             src/lib/metadata.ts — edit there, not here. */}
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         {children}
