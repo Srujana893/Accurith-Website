@@ -1,0 +1,67 @@
+/*
+  # HSTS — tells the browser to only ever reach us over HTTPS for the next 2 years,
+  # including every subdomain. Blocks SSL-strip downgrade attacks. `preload` opts us
+  # into the browser-baked HSTS preload list so a first-time visitor is protected too.
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+  # CSP — the browser's allowlist for what the page can load and execute. Blocks
+  # XSS, malicious third-party scripts, clickjacking-via-iframe, form hijacking,
+  # and mixed content. See notes at the bottom of this file about `'unsafe-inline'`
+  # in script-src: it's what Next.js App Router requires for its hydration bootstrap
+  # scripts and it costs us ~20 points on Mozilla Observatory.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+
+  # X-Frame-Options — legacy sibling of CSP's frame-ancestors. Blocks anyone from
+  # loading our pages inside an <iframe> on their site (clickjacking). Kept
+  # because some older enterprise browsers still honor this and not frame-ancestors.
+  X-Frame-Options: DENY
+
+  # Stops the browser from MIME-sniffing a response and treating (say) a .txt as
+  # JavaScript. Blocks a class of upload-then-execute attacks.
+  X-Content-Type-Options: nosniff
+
+  # Strips the full URL from the Referer header on cross-origin navigations, so
+  # we don't leak internal path names or query params to third parties.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Turns off browser features the site does not use. If an attacker ever manages
+  # to inject script, they still can't reach the camera, mic, GPS, or the Payment
+  # Request API. Denylist-by-default posture.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+  # Isolates the browsing context so cross-origin windows can't peek at our
+  # document object. Cheap defense against Spectre-class side channels.
+  Cross-Origin-Opener-Policy: same-origin
+
+# security.txt should be served as text/plain, RFC 9116.
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
+
+# --- CSP NOTES (read before loosening anything) ---
+#
+# 1. `script-src 'unsafe-inline'` is here because Next.js 16 App Router emits an
+#    inline hydration payload (__NEXT_DATA__ boot script) on every route. Without
+#    'unsafe-inline' the site does not hydrate — you get a static shell, no
+#    interactivity. Mozilla Observatory deducts 20 points for this, capping us at
+#    ~B+ (~80/100). See "A+ path" below for the fix.
+#
+# 2. `style-src 'unsafe-inline'` is here because Tailwind v4 and Next.js both ship
+#    inline <style> blocks (Tailwind's preflight-in-head under some setups, Next's
+#    critical-CSS injection). Observatory does NOT penalize inline styles the same
+#    way — this is the accepted trade-off.
+#
+# 3. connect-src is 'self' only. The SMTP connection to Gmail/SES/etc. happens
+#    inside the Cloudflare Worker via cloudflare:sockets — there is no browser
+#    fetch to the SMTP host. Adding smtp.gmail.com to connect-src would do nothing
+#    useful and would confuse whoever reads this later.
+#
+# 4. frame-ancestors 'none' hardens against clickjacking. X-Frame-Options: DENY
+#    above is the belt to CSP's suspenders for old browsers.
+#
+# 5. A+ PATH (when we're ready to invest the work):
+#    - Move to strict-dynamic + per-request nonce. Requires a Cloudflare Worker
+#      middleware that injects a nonce into every <script> tag on the fly, since
+#      static HTML can't carry a fresh nonce per request.
+#    - OR pre-compute hashes of every inline script Next.js emits and pin those.
+#      Brittle — breaks on every Next.js version bump.
+#    - Either path: 1–2 days of work, plus test coverage. Deferred.

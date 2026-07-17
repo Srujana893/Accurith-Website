@@ -1,0 +1,52 @@
+# =============================================================================
+# .dev.vars.example — commit this file. Never commit the real .dev.vars.
+# =============================================================================
+# HOW THIS FILE IS USED
+#   - Wrangler reads .dev.vars when you run `npm run pages:dev`.
+#   - Every line here becomes an environment variable inside the local Worker
+#     (Cloudflare Pages Function) — that's where /functions/api/contact.ts
+#     reads SMTP credentials from.
+#   - In PRODUCTION these same variables must be set in the Cloudflare Pages
+#     dashboard → Settings → Environment variables (mark them as "Encrypted"
+#     for the secret ones — SMTP_PASS, MAIL_TO if you want it hidden).
+#   - Copy this to .dev.vars for local Worker dev.
+# =============================================================================
+
+# --- SMTP: provider-agnostic on purpose. Do NOT hardcode a specific provider ---
+# We support anything that speaks SMTP over TLS (Gmail SMTP, Google Workspace,
+# Amazon SES, Postmark, Zoho Mail, SendGrid, self-hosted Postfix). The mailbox
+# choice is not final; swap providers by editing this file, not the code.
+
+# SMTP server hostname. Examples:
+#   smtp.gmail.com                 (Google, requires app password)
+#   smtp-mail.outlook.com          (Microsoft 365)
+#   email-smtp.eu-west-1.amazonaws.com  (AWS SES)
+#   smtp.zoho.in                   (Zoho Mail, India region)
+SMTP_HOST=
+
+# 465 = implicit TLS. 587 = STARTTLS. Both work with worker-mailer.
+# Port 25 is BLOCKED by Cloudflare Workers outbound — do not use it.
+SMTP_PORT=465
+
+# SMTP auth user. Usually the full email address of the sending mailbox.
+SMTP_USER=
+
+# SMTP auth password. For Gmail/Workspace, this MUST be an app password
+# generated at https://myaccount.google.com/apppasswords — the account password
+# will not work if 2FA is on (and 2FA must be on).
+# Never commit the real value. Store in Cloudflare Pages dashboard as an
+# Encrypted variable in production.
+SMTP_PASS=
+
+# Where enquiries land. This is the address that receives the "New enquiry"
+# email. Usually a shared inbox like sales@ or hello@.
+MAIL_TO=hello@accurith.com
+
+# -----------------------------------------------------------------------------
+# WHY NONE OF THESE HAVE `NEXT_PUBLIC_`
+#   Any variable prefixed with NEXT_PUBLIC_ in Next.js is inlined into the
+#   static JavaScript bundle at build time — anyone viewing the site source
+#   sees it. Prefixing SMTP_PASS with NEXT_PUBLIC_ would publish our mail
+#   password to the world. These variables read exclusively inside the
+#   Cloudflare Worker (server side), so no prefix is needed or wanted.
+# -----------------------------------------------------------------------------
