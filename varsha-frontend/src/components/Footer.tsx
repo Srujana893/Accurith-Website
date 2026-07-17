@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Linkedin } from "lucide-react";
 import Container from "./ui/Container";
+import Logo from "./Logo";
 import { legalPages, services } from "./siteData";
 
 const companyLinks = [
@@ -78,10 +79,13 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
-          <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()} Accurith Technologies Private Limited
-            · Bengaluru, India
-          </p>
+          <div className="flex flex-col gap-4">
+            <Logo theme="dark" />
+            <p className="text-sm text-slate-400">
+              © {new Date().getFullYear()} Accurith Technologies Private
+              Limited · Bengaluru, India
+            </p>
+          </div>
           <a
             href="https://www.linkedin.com/company/accurith"
             target="_blank"

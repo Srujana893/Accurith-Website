@@ -21,6 +21,14 @@ const config: Config = {
           900: "#095245",
           950: "#042E27",
         },
+        // Logo palette — brand identity board V2·2026, "Trust Navy" lockup.
+        // Logo/mark use only; site UI keeps the teal + navy tokens below
+        // until the full brand system is finalised.
+        brand: {
+          navy: "#0B1E3D",
+          mist: "#C7CDD6",
+          blue: "#3E8EFF",
+        },
         // Headings + the dark contrast bands (AI section, footer).
         navy: {
           DEFAULT: "#1B2A4A",

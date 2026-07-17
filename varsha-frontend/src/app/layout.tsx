@@ -7,7 +7,9 @@ import "@/styles/globals.css";
 
 // V02 — self-hosted via next/font, no external font requests at runtime.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
+// latin-ext: the wordmark uses the dotless "ı" (U+0131) so the logo's
+// verified node can replace the tittle — that glyph lives in latin-ext.
+const sora = Sora({ subsets: ["latin", "latin-ext"], variable: "--font-sora" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 // TODO(S-track): real SEO metadata utility + per-page OpenGraph/JSON-LD live in

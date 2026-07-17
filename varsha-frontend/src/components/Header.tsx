@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, X, ArrowRight } from "lucide-react";
 import Container from "./ui/Container";
 import Button from "./ui/Button";
+import Logo from "./Logo";
 import { cn } from "./ui/cn";
 import {
   additionalServices,
@@ -13,20 +14,10 @@ import {
   primaryNav,
 } from "./siteData";
 
-function Wordmark() {
+function Brand() {
   return (
-    <Link
-      href="/"
-      className="flex items-center gap-2 rounded-lg font-heading text-xl font-semibold tracking-tight text-navy"
-    >
-      <span
-        aria-hidden="true"
-        className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy font-heading text-base text-white"
-      >
-        A
-        <span className="ml-px inline-block h-3.5 w-0.5 bg-teal-400" />
-      </span>
-      Accurith
+    <Link href="/" className="rounded-lg">
+      <Logo />
     </Link>
   );
 }
@@ -111,7 +102,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       <Container className="flex h-16 items-center justify-between">
-        <Wordmark />
+        <Brand />
 
         {/* Desktop nav */}
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
