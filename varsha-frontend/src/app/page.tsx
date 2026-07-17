@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceCard from "@/components/ServiceCard";
+import RevealGroup from "@/components/RevealGroup";
 import {
   credentials,
   featuredServices,
@@ -143,11 +144,11 @@ export default function HomePage() {
             title="What we do"
             description="Advisory that holds up to scrutiny — from assessment through evidence."
           />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {featuredServices.map((s) => (
               <ServiceCard key={s.slug} service={s} />
             ))}
-          </div>
+          </RevealGroup>
         </Container>
       </Section>
 
@@ -211,7 +212,7 @@ export default function HomePage() {
             title="Built around the person accountable"
             description="Different seats carry different risk. We scope engagements to yours."
           />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {roles.map((r) => (
               <div
                 key={r.role}
@@ -225,14 +226,14 @@ export default function HomePage() {
                 </p>
                 <a
                   href="/services"
-                  className="mt-4 inline-flex items-center gap-1 rounded-lg text-sm font-medium text-teal-700 hover:text-teal-800"
+                  className="mt-2 inline-flex min-h-11 items-center gap-1 rounded-lg text-sm font-medium text-teal-700 hover:text-teal-800"
                 >
                   See solutions
                   <ArrowRight aria-hidden="true" size={16} strokeWidth={1.75} />
                 </a>
               </div>
             ))}
-          </div>
+          </RevealGroup>
         </Container>
       </Section>
 
@@ -246,7 +247,7 @@ export default function HomePage() {
             description="The manual parts of audit — evidence, tie-outs, sampling — are exactly what software does best. We build that into how we deliver."
             onNavy
           />
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+          <RevealGroup className="mt-12 grid gap-8 md:grid-cols-3">
             {aiFeatures.map((f) => (
               <div key={f.title}>
                 <f.icon
@@ -261,7 +262,7 @@ export default function HomePage() {
                 </p>
               </div>
             ))}
-          </div>
+          </RevealGroup>
           <div className="mt-12">
             <Button href="/services/ai-automation">
               Explore AI Automation

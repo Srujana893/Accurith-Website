@@ -18,8 +18,9 @@ const resourceLinks = [
 
 const columnHeading =
   "mb-4 font-mono text-xs uppercase tracking-widest text-slate-400";
+// min-h-11 keeps every footer link a 44px touch target.
 const footerLink =
-  "rounded-lg text-sm text-slate-300 transition-colors duration-200 hover:text-white";
+  "flex min-h-11 items-center rounded-lg text-sm text-slate-300 transition-colors duration-200 hover:text-white";
 
 export default function Footer() {
   return (
@@ -28,7 +29,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
             <h2 className={columnHeading}>Company</h2>
-            <ul className="space-y-3">
+            <ul>
               {companyLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className={footerLink}>
@@ -40,7 +41,7 @@ export default function Footer() {
           </div>
           <div>
             <h2 className={columnHeading}>Services</h2>
-            <ul className="space-y-3">
+            <ul>
               {services.map((s) => (
                 <li key={s.slug}>
                   <Link href={`/services/${s.slug}`} className={footerLink}>
@@ -52,7 +53,7 @@ export default function Footer() {
           </div>
           <div>
             <h2 className={columnHeading}>Resources</h2>
-            <ul className="space-y-3">
+            <ul>
               {resourceLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className={footerLink}>
@@ -64,7 +65,7 @@ export default function Footer() {
           </div>
           <div>
             <h2 className={columnHeading}>Legal</h2>
-            <ul className="space-y-3">
+            <ul>
               {legalPages.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className={footerLink}>

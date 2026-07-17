@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   },
   description:
     "Accurith Technologies helps organisations audit, secure, and automate — cybersecurity, IS/IT audit, risk & GRC advisory, and digital forensics, delivered from Bengaluru, India.",
+  openGraph: {
+    images: ["/og-default.jpg"],
+  },
 };
 
 export default function RootLayout({

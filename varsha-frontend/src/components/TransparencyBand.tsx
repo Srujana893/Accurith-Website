@@ -22,7 +22,7 @@ export default function TransparencyBand() {
         </p>
         <Link
           href="/trust"
-          className="rounded-lg py-1 text-sm font-medium text-teal-800 underline-offset-4 hover:underline"
+          className="flex min-h-11 items-center rounded-lg text-sm font-medium text-teal-800 underline-offset-4 hover:underline"
         >
           How we hold ourselves to it →
         </Link>

@@ -4,6 +4,7 @@ import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceCard from "@/components/ServiceCard";
+import RevealGroup from "@/components/RevealGroup";
 import {
   additionalServices,
   featuredServices,
@@ -37,11 +38,11 @@ export default function ServicesPage() {
       <Section tone="grey">
         <Container>
           <SectionHeading index="01" label="Featured" title="Featured services" />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {featuredServices.map((s) => (
               <ServiceCard key={s.slug} service={s} />
             ))}
-          </div>
+          </RevealGroup>
         </Container>
       </Section>
 
@@ -52,11 +53,11 @@ export default function ServicesPage() {
             label="Additional"
             title="Additional services"
           />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:max-w-2xl">
+          <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:max-w-2xl">
             {additionalServices.map((s) => (
               <ServiceCard key={s.slug} service={s} />
             ))}
-          </div>
+          </RevealGroup>
         </Container>
       </Section>
 

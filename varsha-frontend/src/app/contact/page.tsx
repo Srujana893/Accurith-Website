@@ -57,7 +57,7 @@ export default function ContactPage() {
                 />
                 <a
                   href="mailto:hello@accurith.com"
-                  className="rounded-lg underline-offset-4 hover:underline"
+                  className="inline-flex min-h-11 items-center rounded-lg underline-offset-4 hover:underline"
                 >
                   hello@accurith.com
                 </a>

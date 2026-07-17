@@ -4,6 +4,7 @@ import Section from "./ui/Section";
 import Button from "./ui/Button";
 import Badge from "./ui/Badge";
 import SectionHeading from "./SectionHeading";
+import RevealGroup from "./RevealGroup";
 
 export type ServicePageProps = {
   serviceName: string;
@@ -71,7 +72,7 @@ export default function ServicePageTemplate({
             label="What we do"
             title={`What Accurith does in ${serviceName.toLowerCase()}`}
           />
-          <ul className="mt-12 grid gap-6 sm:grid-cols-2">
+          <RevealGroup as="ul" className="mt-12 grid gap-6 sm:grid-cols-2">
             {whatWeDoList.map((item) => (
               <li
                 key={item.title}
@@ -91,7 +92,7 @@ export default function ServicePageTemplate({
                 </span>
               </li>
             ))}
-          </ul>
+          </RevealGroup>
         </Container>
       </Section>
 

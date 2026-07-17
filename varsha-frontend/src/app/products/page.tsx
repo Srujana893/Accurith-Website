@@ -5,6 +5,7 @@ import Section from "@/components/ui/Section";
 import Badge from "@/components/ui/Badge";
 import SectionHeading from "@/components/SectionHeading";
 import EarlyAccessForm from "@/components/EarlyAccessForm";
+import RevealGroup from "@/components/RevealGroup";
 
 export const metadata: Metadata = {
   title: "Products — Launching Soon",
@@ -58,7 +59,7 @@ export default function ProductsPage() {
       <Section tone="grey">
         <Container>
           <SectionHeading index="01" label="Products" title="What's coming" />
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <RevealGroup className="mt-12 grid gap-6 md:grid-cols-3">
             {products.map((p) => (
               <div
                 key={p.name}
@@ -79,7 +80,7 @@ export default function ProductsPage() {
                 </p>
               </div>
             ))}
-          </div>
+          </RevealGroup>
         </Container>
       </Section>
 

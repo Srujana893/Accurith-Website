@@ -19,7 +19,7 @@ export default function SamplePostPage() {
         <p className="mb-6">
           <Link
             href="/resources"
-            className="rounded-lg font-mono text-xs uppercase tracking-widest text-teal-700 hover:underline"
+            className="inline-flex min-h-11 items-center rounded-lg font-mono text-xs uppercase tracking-widest text-teal-700 hover:underline"
           >
             ← Resources
           </Link>

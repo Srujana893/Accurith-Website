@@ -183,7 +183,7 @@ export default function TrustPage() {
           <p className="mt-4">
             <Link
               href="/trust/report-vulnerability"
-              className="rounded-lg font-medium text-teal-700 underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-lg font-medium text-teal-700 underline-offset-4 hover:underline"
             >
               How to report a vulnerability →
             </Link>
