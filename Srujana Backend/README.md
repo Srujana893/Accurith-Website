@@ -178,7 +178,7 @@ date: '2026-07-17'
 author: 'Your Name'
 tags: ['optional', 'tags']
 excerpt: 'One sentence, ~160 chars.'
-draft: false      # true hides from the blog list + sitemap
+draft: false # true hides from the blog list + sitemap
 ---
 
 Your MDX body. Standard Markdown plus any React components Varsha exposes.
@@ -202,15 +202,15 @@ frontmatter field is missing.
    - **Healthcheck path:** `/robots.txt` (200 OK, no DB required)
 4. **Variables** tab — paste:
 
-   | Var | Value | Notes |
-   |-----|-------|-------|
-   | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` | Reference the plugin, don't paste raw |
-   | `NEXT_PUBLIC_SITE_URL` | `https://accurith.com` | |
-   | `SMTP_HOST` | e.g. `smtp.gmail.com` | Provider-agnostic |
-   | `SMTP_PORT` | `465` or `587` | Never 25 |
-   | `SMTP_USER` | full mailbox address | |
-   | `SMTP_PASS` | app password | **Mark as sealed/private** |
-   | `MAIL_TO` | shared inbox | |
+   | Var                    | Value                        | Notes                                 |
+   | ---------------------- | ---------------------------- | ------------------------------------- |
+   | `DATABASE_URL`         | `${{Postgres.DATABASE_URL}}` | Reference the plugin, don't paste raw |
+   | `NEXT_PUBLIC_SITE_URL` | `https://accurith.com`       |                                       |
+   | `SMTP_HOST`            | e.g. `smtp.gmail.com`        | Provider-agnostic                     |
+   | `SMTP_PORT`            | `465` or `587`               | Never 25                              |
+   | `SMTP_USER`            | full mailbox address         |                                       |
+   | `SMTP_PASS`            | app password                 | **Mark as sealed/private**            |
+   | `MAIL_TO`              | shared inbox                 |                                       |
 
 5. Deploy. Watch logs — first deploy runs migrations automatically via the
    start command.
@@ -240,15 +240,15 @@ frontmatter field is missing.
 
 Every variable is annotated in `.env.example`. Quick summary:
 
-| Var | Where set | Purpose |
-|-----|-----------|---------|
-| `DATABASE_URL` | Railway plugin auto, or local `.env.local` | Postgres connection string |
-| `NEXT_PUBLIC_SITE_URL` | Railway + `.env.local` | Public site origin (canonical, OG, sitemap) |
-| `SMTP_HOST` | Railway + `.env.local` | SMTP server hostname |
-| `SMTP_PORT` | Railway + `.env.local` | 465 (implicit TLS) or 587 (STARTTLS) |
-| `SMTP_USER` | Railway + `.env.local` | SMTP auth user (usually a full email) |
-| `SMTP_PASS` | Railway + `.env.local` | SMTP auth password (mark sealed in Railway) |
-| `MAIL_TO` | Railway + `.env.local` | Team inbox for alerts |
+| Var                    | Where set                                  | Purpose                                     |
+| ---------------------- | ------------------------------------------ | ------------------------------------------- |
+| `DATABASE_URL`         | Railway plugin auto, or local `.env.local` | Postgres connection string                  |
+| `NEXT_PUBLIC_SITE_URL` | Railway + `.env.local`                     | Public site origin (canonical, OG, sitemap) |
+| `SMTP_HOST`            | Railway + `.env.local`                     | SMTP server hostname                        |
+| `SMTP_PORT`            | Railway + `.env.local`                     | 465 (implicit TLS) or 587 (STARTTLS)        |
+| `SMTP_USER`            | Railway + `.env.local`                     | SMTP auth user (usually a full email)       |
+| `SMTP_PASS`            | Railway + `.env.local`                     | SMTP auth password (mark sealed in Railway) |
+| `MAIL_TO`              | Railway + `.env.local`                     | Team inbox for alerts                       |
 
 `.env.local` is git-ignored. `.env.example` is committed.
 

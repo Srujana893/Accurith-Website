@@ -1,26 +1,143 @@
+/* Accurith design system — Tailwind v4 CSS-first config.
+ * Every color/font token the site uses lives in the @theme block below
+ * (this file replaces the old tailwind.config.ts from the static-export era).
+ * Rule: no hardcoded hex values or arbitrary spacing anywhere in components.
+ */
 @import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Brand accent — buttons, links, small accents only; never a large fill.
+   * Note: primary buttons use teal-700 — white on teal-600 is 3.4:1, below
+   * the 4.5:1 WCAG AA minimum. 600 is for icons/borders on white. */
+  --color-teal-50: #edfaf6;
+  --color-teal-100: #d5f3ea;
+  --color-teal-200: #ace6d6;
+  --color-teal-300: #7bd4bd;
+  --color-teal-400: #45bc9f;
+  --color-teal-500: #16a886;
+  --color-teal-600: #0e9e82; /* brand base */
+  --color-teal-700: #0b7e68;
+  --color-teal-800: #0a6454;
+  --color-teal-900: #095245;
+  --color-teal-950: #042e27;
+
+  /* Headings + the dark contrast bands (AI section, footer). */
+  --color-navy: #1b2a4a;
+  --color-navy-light: #2a3d66;
+  --color-navy-dark: #131e36;
+  --color-dark: #222222;
+
+  /* Logo palette — brand identity board V2·2026, "Trust Navy" lockup.
+   * Logo/mark use only; site UI keeps the teal + navy tokens above. */
+  --color-brand-navy: #0b1e3d;
+  --color-brand-mist: #c7cdd6;
+  --color-brand-blue: #3e8eff;
+
+  --font-heading: var(--font-sora), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, monospace;
+
+  --default-transition-duration: 200ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ---- Base ----------------------------------------------------------------
+ * Must stay inside @layer base: un-layered CSS outranks Tailwind's layered
+ * utilities in v4, which would stop classes like text-slate-400 from
+ * overriding the heading color. */
+@layer base {
+  body {
+    background: #fff;
+    color: var(--color-slate-700);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: var(--color-navy);
+  }
+
+  /* Visible focus ring on every interactive element, site-wide. */
+  :focus-visible {
+    outline: 2px solid var(--color-teal-600);
+    outline-offset: 2px;
+    border-radius: var(--radius-lg);
+  }
+  .bg-navy :focus-visible,
+  .bg-navy-dark :focus-visible {
+    outline-color: var(--color-teal-300);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---- Signature elements -------------------------------------------------- */
+
+/* 1a — sparse teal dot-grid, whisper-quiet (~4–6% opacity). */
+@utility bg-audit-grid {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-teal-600) 7%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+}
+@utility bg-audit-grid-navy {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--color-teal-300) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+}
+
+/* 1b — tiny 8px corner-tick marks on featured cards. */
+@layer components {
+  .corner-ticks {
+    position: relative;
+  }
+  .corner-ticks::before,
+  .corner-ticks::after {
+    content: '';
+    position: absolute;
+    width: --spacing(2);
+    height: --spacing(2);
+    border-color: color-mix(in oklab, var(--color-teal-600) 60%, transparent);
+    pointer-events: none;
+  }
+  .corner-ticks::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .corner-ticks::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+}
+
+/* ---- Motion (V28) -------------------------------------------------------- */
+
+/* Scroll-reveal: elements with [data-reveal] start hidden and slide up ~12px
+ * when .is-revealed is added by RevealGroup. Fully disabled under
+ * prefers-reduced-motion (and never used on the Trust page). */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

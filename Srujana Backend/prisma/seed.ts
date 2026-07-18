@@ -38,7 +38,7 @@ async function main() {
       location: 'Remote (India)',
       employmentType: 'Full-time',
       descriptionMd:
-        '## About the role\n\nHelp clients build ISO 27001 / DPDP-aligned control frameworks and prepare for external certification audits.\n\n## What we expect\n\n- 2+ years in a GRC or IS-audit adjacent role\n- Working knowledge of ISO 27001, NIST CSF, and India\'s DPDP Act 2023\n- ISO 27001 Lead Implementer certification is a plus',
+        "## About the role\n\nHelp clients build ISO 27001 / DPDP-aligned control frameworks and prepare for external certification audits.\n\n## What we expect\n\n- 2+ years in a GRC or IS-audit adjacent role\n- Working knowledge of ISO 27001, NIST CSF, and India's DPDP Act 2023\n- ISO 27001 Lead Implementer certification is a plus",
       isOpen: true,
     },
   ];
