@@ -70,5 +70,7 @@ export function middleware(request: NextRequest) {
 // Apply to every route except Next's static assets, images, and favicon —
 // those are served without a document context and don't need a CSP.
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.well-known).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.well-known).*)',
+  ],
 };

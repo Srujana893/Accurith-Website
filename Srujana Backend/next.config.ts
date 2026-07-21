@@ -37,8 +37,7 @@ const nextConfig: NextConfig = {
           // can't reach camera/mic/GPS/payment.
           {
             key: 'Permissions-Policy',
-            value:
-              'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+            value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
           },
           // Isolate the browsing context — cheap defense against Spectre-class
           // cross-origin leaks.

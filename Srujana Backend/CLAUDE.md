@@ -35,27 +35,27 @@ Marketing site + backend for **Accurith Technologies Private Limited**
 
 ### Srujana owns (edit these):
 
-| Path                                      | Purpose                                                       |
-| ----------------------------------------- | ------------------------------------------------------------- |
-| `/prisma/`                                | Schema + migrations + seed                                    |
-| `/src/app/api/`                           | Route handlers                                                |
-| `/src/lib/`                               | db.ts, mail.ts, validation.ts, abuse.ts, metadata.ts, blog.ts |
-| `/content/blog/`                          | MDX posts                                                     |
-| `/public/.well-known/`                    | security.txt                                                  |
-| `next.config.ts`                          | Static headers + build config                                 |
-| `/src/middleware.ts`                      | Per-request CSP nonce                                         |
-| `/src/app/layout.tsx`                     | Metadata export + nonce plumbing + JSON-LD (see §3)           |
-| `.env.example`, Railway config            | Config templates                                              |
-| `src/app/sitemap.ts`, `src/app/robots.ts` | SEO artifacts                                                 |
+| Path | Purpose |
+|------|---------|
+| `/prisma/` | Schema + migrations + seed |
+| `/src/app/api/` | Route handlers |
+| `/src/lib/` | db.ts, mail.ts, validation.ts, abuse.ts, metadata.ts, blog.ts |
+| `/content/blog/` | MDX posts |
+| `/public/.well-known/` | security.txt |
+| `next.config.ts` | Static headers + build config |
+| `/src/middleware.ts` | Per-request CSP nonce |
+| `/src/app/layout.tsx` | Metadata export + nonce plumbing + JSON-LD (see §3) |
+| `.env.example`, Railway config | Config templates |
+| `src/app/sitemap.ts`, `src/app/robots.ts` | SEO artifacts |
 
 ### Varsha owns (stop and ask):
 
-| Path                                | Purpose                   |
-| ----------------------------------- | ------------------------- |
-| `/src/components/`                  | All React UI              |
-| `/src/app/globals.css`              | Tailwind v4 design tokens |
-| `/public/images/`, `/public/icons/` | Brand assets              |
-| `/src/app/**/page.tsx`              | All page visuals          |
+| Path | Purpose |
+|------|---------|
+| `/src/components/` | All React UI |
+| `/src/app/globals.css` | Tailwind v4 design tokens |
+| `/public/images/`, `/public/icons/` | Brand assets |
+| `/src/app/**/page.tsx` | All page visuals |
 
 **Tailwind v4 note:** there is NO `tailwind.config.ts`. Tokens live in
 `globals.css` via `@theme inline { ... }`. Do not create a Tailwind config.
@@ -148,11 +148,11 @@ before adding complexity here.
 We now use per-request nonces + `strict-dynamic`. Both were impossible under
 static export — this is the entire reason we moved to standalone.
 
-| Scanner                 | Predicted                    | What's still between us and A+                                                                                                                                                                                                                                           |
-| ----------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **SSL Labs**            | **A+** (with Cloudflare TLS) | Nothing at our end — depends on the Cloudflare/Railway TLS chain. Blocker: needs custom domain live.                                                                                                                                                                     |
-| **securityheaders.com** | **A+**                       | Should be clean — six headers plus a nonce'd CSP.                                                                                                                                                                                                                        |
-| **Mozilla Observatory** | **A / A+ (~100/100)**        | Small deductions possible for `style-src 'unsafe-inline'` (Tailwind + Next inject inline styles; Observatory does not dock this the way it docks script-src). If the grade comes back short, the fix is to migrate to nonce'd styles or hash-pin them — 4–8 hrs of work. |
+| Scanner | Predicted | What's still between us and A+ |
+|---------|-----------|-------------------------------|
+| **SSL Labs** | **A+** (with Cloudflare TLS) | Nothing at our end — depends on the Cloudflare/Railway TLS chain. Blocker: needs custom domain live. |
+| **securityheaders.com** | **A+** | Should be clean — six headers plus a nonce'd CSP. |
+| **Mozilla Observatory** | **A / A+ (~100/100)** | Small deductions possible for `style-src 'unsafe-inline'` (Tailwind + Next inject inline styles; Observatory does not dock this the way it docks script-src). If the grade comes back short, the fix is to migrate to nonce'd styles or hash-pin them — 4–8 hrs of work. |
 
 The critical piece: **`script-src` NEVER contains `'unsafe-inline'`.** That's
 where Observatory hurts most. We use `'nonce-<random>' 'strict-dynamic'`
@@ -163,41 +163,36 @@ instead — safe and modern.
 ## 7. Submission contracts (J01 with Varsha)
 
 ### `POST /api/consultation`
-
 ```jsonc
 {
-  "name": "string, 1–200",
-  "email": "email, ≤254",
-  "company": "string, 1–200",
-  "role": "string, 1–200",
-  "service": "string, 1–200",
-  "message": "string, 1–5000",
-  "website": "", // honeypot — MUST be empty; hidden in Varsha's form
+  "name":     "string, 1–200",
+  "email":    "email, ≤254",
+  "company":  "string, 1–200",
+  "role":     "string, 1–200",
+  "service":  "string, 1–200",
+  "message":  "string, 1–5000",
+  "website":  ""     // honeypot — MUST be empty; hidden in Varsha's form
 }
 ```
-
 Response 200 `{ "success": true }` on happy path OR honeypot triggered.
 Response 400 / 413 / 415 / 429 / 500 with `{ "success": false, "error": "…" }`.
 
 ### `POST /api/careers/apply`
-
 ```jsonc
 {
-  "openingId": "string (from GET openings)",
-  "name": "string",
-  "email": "email",
-  "phone": "digits + separators, 6–20",
-  "linkedinUrl": "http(s) URL",
+  "openingId":    "string (from GET openings)",
+  "name":         "string",
+  "email":        "email",
+  "phone":        "digits + separators, 6–20",
+  "linkedinUrl":  "http(s) URL",
   "portfolioUrl": "http(s) URL, optional",
-  "coverNote": "string, 1–5000",
-  "website": "", // honeypot
+  "coverNote":    "string, 1–5000",
+  "website":      ""     // honeypot
 }
 ```
-
 404 if `openingId` unknown or `isOpen: false` (indistinguishable on purpose).
 
 ### `GET /api/careers/openings`
-
 Returns `{ openings: [ { id, slug, title, department, location, employmentType, descriptionMd, postedAt } ] }`. `isOpen = true` only. Cached 60s public.
 
 ---
@@ -224,23 +219,16 @@ We now store personal data. **These are decisions for the client, not me:**
 
 ---
 
-## 9. Two-directory reality check — MERGED 2026-07-18
+## 9. Two-directory reality check
 
-The merge described here is **done**, in the documented direction: Varsha's
-components, all 21 page routes, `globals.css` design tokens (migrated from
-her Tailwind v3 `tailwind.config.ts` to v4 `@theme`), brand logo system,
-fonts, and public assets were pulled INTO this project. **This folder is the
-single canonical app.**
+Repo still has two sibling scaffolds:
 
-- `varsha-frontend/` is now a **legacy reference copy** (its CLAUDE.md says
-  so) — kept until both developers review the merged app, then deleted.
-- Integration status: contact form → `POST /api/consultation` (honeypot
-  wired) ✅ · `/careers` → openings + apply APIs ✅ · blog →
-  `/resources/blog` via `src/lib/blog.ts` + next-mdx-remote ✅ · sitemap
-  synced to the real route tree ✅.
-- Still open: the Products **early-access form** posts to a local mock
-  (`src/mocks/earlyAccess.ts`) — needs a real endpoint (S-track decision:
-  own route vs. fold into consultation).
-- Verified post-merge: build + eslint clean, axe 0 WCAG 2.1 A/AA violations
-  on 20 routes, no horizontal overflow at 375/768/1280, browser E2E of both
-  forms against a local Postgres, 0 CSP violations in console.
+- `Srujana Backend/` — this project (canonical: DB, API, security, CSP,
+  Prisma, nodemailer)
+- `varsha-frontend/` — Varsha's separate scaffold (own next.config, own
+  package.json, own CLAUDE.md that still describes the static architecture)
+
+They must merge before ship. Direction: pull Varsha's `/src/components/`,
+her `page.tsx` files, her `globals.css`, and her brand assets INTO this
+project. Everything infrastructural is here. Flag the merge day so we don't
+each spend a week diverging further.

@@ -33,11 +33,7 @@ export interface BlogPost extends BlogPostMeta {
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'blog');
 
-function readAllFrontmatter(): {
-  file: string;
-  slug: string;
-  data: matter.GrayMatterFile<string>;
-}[] {
+function readAllFrontmatter(): { file: string; slug: string; data: matter.GrayMatterFile<string> }[] {
   if (!fs.existsSync(CONTENT_DIR)) return [];
   return fs
     .readdirSync(CONTENT_DIR)
