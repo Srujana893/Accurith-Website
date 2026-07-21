@@ -73,8 +73,9 @@ export const featuredServices = services.filter((s) => s.featured);
 export const additionalServices = services.filter((s) => !s.featured);
 
 // Leadership credentials — the #1 trust asset. Shown where a competitor would
-// put a customer-logo wall (Home + About).
-export const credentials = ["CISA", "CISSP", "CISM", "CEH", "CA"];
+// put a customer-logo wall (Home + About). House rule: name ONLY credentials
+// actually held (confirmed in the 2026-07 design handoff).
+export const credentials = ["DISA", "FAFD", "ISC2 CC", "DPCAC"];
 
 // Frameworks Accurith aligns delivery to. Always rendered as text Badge chips.
 export const frameworks = [
@@ -87,12 +88,35 @@ export const frameworks = [
   "PCI-DSS",
 ];
 
-export const primaryNav = [
-  { label: "Services", href: "/services", hasMenu: true },
+// Direction B header nav. Dropdown children carry a one-line desc, per the
+// prototype. Every href must be a real route — no invented pages.
+export type NavChild = { label: string; desc: string; href: string };
+export type NavItem = { label: string; href: string; children?: NavChild[] };
+
+export const companyLinks: NavChild[] = [
+  { label: "About", desc: "Company & leadership", href: "/about" },
+  { label: "Careers", desc: "Open roles", href: "/about/careers" },
+  {
+    label: "Trust & Security",
+    desc: "How we handle your evidence",
+    href: "/trust",
+  },
+  { label: "Contact", desc: "Book a consultation", href: "/contact" },
+];
+
+export const primaryNav: NavItem[] = [
+  {
+    label: "Services",
+    href: "/services",
+    children: services.map((s) => ({
+      label: s.name,
+      desc: s.shortDescription,
+      href: `/services/${s.slug}`,
+    })),
+  },
   { label: "Products", href: "/products" },
-  { label: "Trust", href: "/trust" },
-  { label: "About", href: "/about" },
-  { label: "Resources", href: "/resources" },
+  { label: "Insights", href: "/resources" },
+  { label: "Company", href: "/about", children: companyLinks },
 ];
 
 export const legalPages = [

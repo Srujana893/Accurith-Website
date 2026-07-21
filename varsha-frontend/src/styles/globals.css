@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-white font-body text-slate-700 antialiased;
+    @apply bg-white font-body text-ink-2 antialiased;
   }
 
   h1,
@@ -13,16 +13,22 @@
   h4,
   h5,
   h6 {
-    @apply font-heading text-navy;
+    @apply font-heading text-ink;
+  }
+
+  ::selection {
+    @apply bg-accent text-white;
   }
 
   /* Visible focus ring on every interactive element, site-wide. */
   :focus-visible {
-    @apply outline-none ring-2 ring-teal-600 ring-offset-2;
+    @apply outline-none ring-2 ring-accent ring-offset-2;
   }
+  .bg-base :focus-visible,
+  .bg-footer :focus-visible,
   .bg-navy :focus-visible,
   .bg-navy-dark :focus-visible {
-    @apply ring-teal-300 ring-offset-navy;
+    @apply ring-accent-light ring-offset-base;
   }
 }
 
@@ -89,5 +95,21 @@
   [data-reveal].is-revealed {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  /* Direction B entrance: hero slide content rises 18px on carousel change.
+     Applied via .anim-rise; keyed remounts restart it. */
+  .anim-rise {
+    animation: rise 0.55s ease;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

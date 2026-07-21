@@ -1,44 +1,40 @@
 import Link from "next/link";
 import { Linkedin } from "lucide-react";
-import Container from "./ui/Container";
 import Logo from "./Logo";
-import { legalPages, services } from "./siteData";
+import { companyLinks, legalPages, services } from "./siteData";
 
-const companyLinks = [
-  { label: "About", href: "/about" },
-  { label: "Careers", href: "/about/careers" },
-  { label: "Trust & Security", href: "/trust" },
-  { label: "Contact", href: "/contact" },
-];
+// Direction B footer — darkest surface, logo on a white chip, blurb + real
+// Bengaluru address, three link columns, legal row.
 
-const resourceLinks = [
-  { label: "Blog", href: "/resources" },
-  { label: "Products", href: "/products" },
-  { label: "Report a Vulnerability", href: "/trust/report-vulnerability" },
+const contactLinks = [
+  { label: "Request a demo", href: "/contact" },
+  { label: "Book a consultation", href: "/contact" },
+  { label: "Report a vulnerability", href: "/trust/report-vulnerability" },
 ];
 
 const columnHeading =
   "mb-4 font-mono text-xs uppercase tracking-widest text-slate-400";
 // min-h-11 keeps every footer link a 44px touch target.
 const footerLink =
-  "flex min-h-11 items-center rounded-lg text-sm text-slate-300 transition-colors duration-200 hover:text-white";
+  "flex min-h-11 items-center rounded-lg text-sm text-slate-300 transition-colors duration-200 hover:text-accent-light";
 
 export default function Footer() {
   return (
-    <footer className="bg-navy-dark text-slate-300">
-      <Container className="py-12 md:py-16">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <div>
-            <h2 className={columnHeading}>Company</h2>
-            <ul>
-              {companyLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className={footerLink}>
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+    <footer className="bg-footer text-slate-300">
+      <div className="mx-auto max-w-content px-6 pb-11 pt-16 md:px-12">
+        <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          <div className="flex flex-col items-start gap-4">
+            <Link href="/" className="rounded-lg">
+              <Logo theme="dark" />
+            </Link>
+            <p className="max-w-xs text-[13px] leading-relaxed text-slate-400">
+              Audit-grade AI for India&rsquo;s regulatory reality — IS/IT
+              audit, risk, GRC and digital forensics.
+            </p>
+            <p className="max-w-xs text-[13px] leading-relaxed text-slate-400">
+              #24, 1st Floor, Beside Sai Castle, Balaji Layout, Kodigehalli,
+              Bangalore – 560092
+            </p>
           </div>
           <div>
             <h2 className={columnHeading}>Services</h2>
@@ -53,22 +49,27 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h2 className={columnHeading}>Resources</h2>
+            <h2 className={columnHeading}>Company</h2>
             <ul>
-              {resourceLinks.map((l) => (
+              {companyLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className={footerLink}>
                     {l.label}
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/resources" className={footerLink}>
+                  Insights
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
-            <h2 className={columnHeading}>Legal</h2>
+            <h2 className={columnHeading}>Contact</h2>
             <ul>
-              {legalPages.map((l) => (
-                <li key={l.href}>
+              {contactLinks.map((l) => (
+                <li key={l.label}>
                   <Link href={l.href} className={footerLink}>
                     {l.label}
                   </Link>
@@ -78,25 +79,36 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
-          <div className="flex flex-col gap-4">
-            <Logo theme="dark" />
-            <p className="text-sm text-slate-400">
-              © {new Date().getFullYear()} Accurith Technologies Private
-              Limited · Bengaluru, India
-            </p>
+        <div className="mt-11 flex flex-col items-start justify-between gap-4 border-t border-line-footer pt-6 sm:flex-row sm:items-center">
+          <p className="text-xs text-slate-400">
+            © {new Date().getFullYear()} Accurith Technologies Private Limited
+            · Karnataka, India
+          </p>
+          <div className="flex items-center gap-5">
+            {legalPages.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="flex min-h-11 items-center rounded-lg text-xs text-slate-400 transition-colors duration-200 hover:text-accent-light"
+              >
+                {l.label
+                  .replace(" Policy", "")
+                  .replace(" of Service", "")
+                  .replace("Data Processing Agreement", "DPA")}
+              </Link>
+            ))}
+            <a
+              href="https://www.linkedin.com/company/accurith"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Accurith on LinkedIn"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors duration-200 hover:text-accent-light"
+            >
+              <Linkedin aria-hidden="true" size={20} strokeWidth={1.75} />
+            </a>
           </div>
-          <a
-            href="https://www.linkedin.com/company/accurith"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Accurith on LinkedIn"
-            className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors duration-200 hover:text-white"
-          >
-            <Linkedin aria-hidden="true" size={24} strokeWidth={1.75} />
-          </a>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

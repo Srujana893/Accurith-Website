@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, Sora, JetBrains_Mono } from "next/font/google";
+import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TransparencyBand from "@/components/TransparencyBand";
 import "@/styles/globals.css";
 
 // V02 — self-hosted via next/font, no external font requests at runtime.
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-// latin-ext: the wordmark uses the dotless "ı" (U+0131) so the logo's
-// verified node can replace the tittle — that glyph lives in latin-ext.
-const sora = Sora({ subsets: ["latin", "latin-ext"], variable: "--font-sora" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+// Direction B type stack: Archivo display, IBM Plex Sans body, Plex Mono labels.
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
+const plexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex-sans",
+});
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+});
 
 // TODO(S-track): real SEO metadata utility + per-page OpenGraph/JSON-LD live in
 // Srujana's src/lib/metadata.ts. This is a minimal prototype default only.
@@ -34,7 +41,7 @@ export default function RootLayout({
       {/* TODO(S-track): cookie-consent script, privacy-first analytics
           (Plausible/Umami), and JSON-LD organization schema mount here. */}
       <body
-        className={`${inter.variable} ${sora.variable} ${mono.variable} font-body`}
+        className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable} font-body`}
       >
         <a
           href="#main-content"
