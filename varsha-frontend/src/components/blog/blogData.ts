@@ -18,6 +18,8 @@ export type BlogPost = {
   /** Optional card/hero image under /public/images. */
   image?: string;
   imageAlt?: string;
+  /** Crop side for wide artwork (maps to object-left/right, never style=). */
+  imagePos?: "left" | "right";
 };
 
 export const blogPosts: BlogPost[] = [
@@ -30,8 +32,9 @@ export const blogPosts: BlogPost[] = [
     date: "July 2026",
     readTime: "9 min read",
     featured: true,
-    image: "/images/home/featured-robot.png",
-    imageAlt: "AI assistant illustration",
+    image: "/images/home/hero-bg.jpg",
+    imageAlt: "Night city skyline with data overlays",
+    imagePos: "left",
   },
   {
     slug: "what-a-first-is-audit-covers",

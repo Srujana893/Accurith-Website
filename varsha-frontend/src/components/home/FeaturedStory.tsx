@@ -36,7 +36,13 @@ export default function FeaturedStory() {
                   alt={featuredPost.imageAlt ?? ""}
                   fill
                   sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.04]"
+                  className={
+                    featuredPost.imagePos === "left"
+                      ? "object-cover object-left transition-transform duration-500 motion-safe:group-hover:scale-[1.04]"
+                      : featuredPost.imagePos === "right"
+                        ? "object-cover object-right transition-transform duration-500 motion-safe:group-hover:scale-[1.04]"
+                        : "object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.04]"
+                  }
                 />
               </span>
             )}

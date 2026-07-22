@@ -42,7 +42,13 @@ export default function BlogPage() {
                 alt={featuredPost.imageAlt ?? ""}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
+                className={
+                  featuredPost.imagePos === "left"
+                    ? "object-cover object-left"
+                    : featuredPost.imagePos === "right"
+                      ? "object-cover object-right"
+                      : "object-cover"
+                }
               />
             )}
           </div>
