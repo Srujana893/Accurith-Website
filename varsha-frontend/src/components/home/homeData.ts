@@ -82,15 +82,14 @@ export const expertise: {
     title: "Risk & GRC",
     desc: "ISO 27001, SOC 2, NIST, COBIT and internal controls.",
     href: "/services/risk-grc-advisory",
-    image: "/images/home/hero-bg.jpg",
-    imagePos: "left",
+    image: "/images/home/hero-grc.jpg",
   },
   {
     no: "04",
     title: "AI Automation",
     desc: "Evidence collection, monitoring and workpaper drafting.",
     href: "/services/ai-automation",
-    image: "/images/home/hero-monument.jpg",
+    image: "/images/home/hero-ai.jpg",
   },
   {
     no: "05",
@@ -104,8 +103,7 @@ export const expertise: {
     title: "Managed Services",
     desc: "Ongoing security and compliance operations, as a service.",
     href: "/services/managed-services",
-    image: "/images/home/hero-bg.jpg",
-    imagePos: "right",
+    image: "/images/home/hero-managed.jpg",
   },
 ];
 
