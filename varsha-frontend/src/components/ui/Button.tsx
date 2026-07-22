@@ -4,27 +4,26 @@ import { cn } from "./cn";
 type ButtonVariant = "primary" | "outline" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
-// One teal (primary) action per section; secondary actions use outline/ghost.
+// Direction C buttons — sharp corners, caps letterspaced text, one accent
+// (primary) action per section; secondary actions use outline/ghost.
 const variantClasses: Record<ButtonVariant, string> = {
-  // teal-700 (not brand-base 600): white-on-teal-600 is 3.4:1, below the
-  // 4.5:1 AA minimum. 600 remains the accent for icons/borders on white.
   primary:
-    "bg-teal-700 text-white hover:bg-teal-800 hover:shadow-md disabled:hover:bg-teal-700",
+    "bg-accent text-white hover:bg-accent-hover disabled:hover:bg-accent",
   outline:
-    "border border-navy/30 text-navy hover:border-navy hover:shadow-sm bg-transparent",
-  ghost: "text-navy hover:bg-slate-100",
+    "border border-ink/30 text-ink hover:border-ink bg-transparent",
+  ghost: "text-ink hover:bg-sec1",
 };
 
 // md/lg meet the 44px touch-target minimum; sm is for dense desktop-only spots.
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "px-4 py-2 text-sm min-h-10",
-  md: "px-5 py-3 text-base min-h-11",
-  lg: "px-7 py-3.5 text-lg min-h-12",
+  sm: "px-4 py-2 text-[11px] min-h-10",
+  md: "px-6 py-3 text-xs min-h-11",
+  lg: "px-8 py-3.5 text-[13px] min-h-12",
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium " +
-  "transition-all duration-200 ease-out active:scale-[0.98] " +
+  "inline-flex items-center justify-center gap-2 font-semibold uppercase tracking-kicker " +
+  "transition-colors duration-200 ease-out " +
   "disabled:opacity-50 disabled:pointer-events-none";
 
 type CommonProps = {

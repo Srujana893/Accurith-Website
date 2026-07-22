@@ -74,15 +74,15 @@ const methodologySteps = [
 export default function TrustPage() {
   return (
     <>
-      <Section tone="white" hairline={false} className="md:py-28">
+      <section className="bg-hero py-20 text-white md:py-28">
         <Container>
-          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-teal-700">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-label text-accent-light">
             Trust &amp; Security
           </p>
-          <h1 className="max-w-3xl text-4xl leading-tight tracking-tight md:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-tight text-white md:text-5xl">
             Our commitment to trust
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80">
             We advise organisations on security and audit, so we accept a
             simple standard: everything we claim should be verifiable, and
             anything we ask clients to do, we do ourselves. This page states
@@ -90,7 +90,7 @@ export default function TrustPage() {
             us.
           </p>
         </Container>
-      </Section>
+      </section>
 
       <Section tone="grey">
         <Container>
@@ -99,10 +99,10 @@ export default function TrustPage() {
             label="Frameworks"
             title="Frameworks we align to"
           />
-          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink-2">
             We align our delivery to these frameworks and help clients achieve
             certification.{" "}
-            <strong className="font-medium text-navy">
+            <strong className="font-medium text-ink">
               We do not claim certifications we do not hold.
             </strong>
           </p>
@@ -127,11 +127,11 @@ export default function TrustPage() {
           <ol className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {methodologySteps.map((step, i) => (
               <li key={step.title}>
-                <p className="inline-flex rounded-lg border border-teal-300 bg-white px-2 py-1 font-mono text-xs text-teal-800">
+                <p className="inline-flex border border-accent/40 bg-white px-2 py-1 text-[11px] font-semibold tracking-label text-accent-dark">
                   {String(i + 1).padStart(2, "0")}
                 </p>
-                <h3 className="mt-4 text-xl">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                <h3 className="mt-4 text-xl text-ink">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-2">
                   {step.description}
                 </p>
               </li>
@@ -152,16 +152,16 @@ export default function TrustPage() {
             {siteSecurityPractices.map((p) => (
               <div
                 key={p.name}
-                className="rounded-lg border border-slate-200 bg-white p-6"
+                className="border border-line-light bg-white p-6"
               >
-                <dt className="font-mono text-sm text-navy">{p.name}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-slate-700">
+                <dt className="text-sm font-medium text-ink">{p.name}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-2">
                   {p.explanation}
                 </dd>
               </div>
             ))}
           </dl>
-          <p className="mt-6 text-sm text-slate-600">
+          <p className="mt-6 text-sm text-ink-3">
             You don&apos;t have to take our word for it — scan accurith.com
             with securityheaders.com or Mozilla Observatory at any time.
           </p>
@@ -175,7 +175,7 @@ export default function TrustPage() {
             label="Disclosure"
             title="Report a vulnerability"
           />
-          <p className="mt-6 text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 text-lg leading-relaxed text-ink-2">
             If you believe you&apos;ve found a security issue in this website
             or anything else we operate, we want to hear about it — and
             we&apos;ll treat you as a colleague, not a threat.
@@ -183,7 +183,7 @@ export default function TrustPage() {
           <p className="mt-4">
             <Link
               href="/trust/report-vulnerability"
-              className="inline-flex min-h-11 items-center rounded-lg font-medium text-teal-700 underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center font-medium text-accent-dark underline-offset-4 hover:underline"
             >
               How to report a vulnerability →
             </Link>
@@ -194,7 +194,7 @@ export default function TrustPage() {
       <Section tone="grey">
         <Container className="max-w-3xl">
           <SectionHeading index="05" label="Data" title="How we handle your data" />
-          <p className="mt-6 text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 text-lg leading-relaxed text-ink-2">
             When you submit a form on this site, the details you provide go to
             our CRM so we can respond, and nowhere else. Data is encrypted in
             transit. We don&apos;t sell contact data, and we don&apos;t add
@@ -202,7 +202,7 @@ export default function TrustPage() {
             lives in our{" "}
             <Link
               href="/legal/privacy"
-              className="rounded-lg font-medium text-teal-700 underline-offset-4 hover:underline"
+              className="font-medium text-accent-dark underline-offset-4 hover:underline"
             >
               privacy policy
             </Link>

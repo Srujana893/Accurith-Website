@@ -10,7 +10,7 @@ import { submitContact } from "@/mocks/contact";
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const inputClasses =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-500 transition-colors duration-200 hover:border-slate-400";
+  "w-full border border-line-light bg-white px-4 py-3 text-base text-ink placeholder:text-ink-3 transition-colors duration-200 hover:border-ink-3 focus:border-accent focus:outline-none";
 
 const emptyForm = {
   name: "",
@@ -48,16 +48,16 @@ export default function ContactForm() {
     return (
       <div
         role="status"
-        className="rounded-lg border border-teal-300 bg-teal-50 p-8"
+        className="border border-accent/40 bg-sec1 p-8"
       >
         <CheckCircle2
           aria-hidden="true"
           size={24}
           strokeWidth={1.75}
-          className="text-teal-700"
+          className="text-accent-dark"
         />
-        <h2 className="mt-4 text-2xl">Thank you — we&apos;ve got it.</h2>
-        <p className="mt-2 leading-relaxed text-slate-700">
+        <h2 className="mt-4 text-2xl font-light text-ink">Thank you — we&apos;ve got it.</h2>
+        <p className="mt-2 leading-relaxed text-ink-2">
           Your message is on its way to our team. We respond within one
           business day.
         </p>
@@ -80,7 +80,7 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} noValidate={false}>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="contact-name" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-name" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Name
           </label>
           <input
@@ -94,7 +94,7 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="contact-email" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-email" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Work email
           </label>
           <input
@@ -108,7 +108,7 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="contact-company" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-company" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Company
           </label>
           <input
@@ -122,7 +122,7 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="contact-role" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-role" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Role
           </label>
           <input
@@ -135,7 +135,7 @@ export default function ContactForm() {
           />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="contact-service" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-service" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Service of interest
           </label>
           <select
@@ -143,7 +143,7 @@ export default function ContactForm() {
             required
             value={form.service}
             onChange={update("service")}
-            className={cn(inputClasses, form.service === "" && "text-slate-500")}
+            className={cn(inputClasses, form.service === "" && "text-ink-3")}
           >
             <option value="" disabled>
               Select a service…
@@ -157,7 +157,7 @@ export default function ContactForm() {
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="contact-message" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="contact-message" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Message
           </label>
           <textarea
@@ -175,7 +175,7 @@ export default function ContactForm() {
       {status === "error" && (
         <div
           role="alert"
-          className="mt-5 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-4"
+          className="mt-5 flex items-start gap-3 border border-red-300 bg-red-50 p-4"
         >
           <CircleAlert
             aria-hidden="true"

@@ -17,16 +17,17 @@ export const metadata: Metadata = {
 export default function KitchenSinkPage() {
   return (
     <>
-      <Section tone="white" hairline={false} dotGrid>
+      <section className="bg-hero py-20 text-white md:py-28">
         <Container>
           <SectionHeading
             index="00"
             label="Kitchen Sink"
             title="Every primitive, every state"
             description="Dev-only reference page. The dot-grid behind this section is signature element 1 at its intended, whisper-quiet opacity."
+            onNavy
           />
         </Container>
-      </Section>
+      </section>
 
       <Section tone="grey">
         <Container className="space-y-10">
@@ -62,18 +63,18 @@ export default function KitchenSinkPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <a
                 href="#"
-                className="corner-ticks group block rounded-lg border border-slate-200 bg-white p-6 transition-all duration-200 ease-out hover:border-teal-300 hover:shadow-md"
+                className="corner-ticks group block border border-line-light bg-white p-6 transition-all duration-200 ease-out hover:border-accent/40 hover:shadow-md"
               >
                 <ShieldCheck
                   aria-hidden="true"
                   size={24}
                   strokeWidth={1.75}
-                  className="text-teal-700"
+                  className="text-accent-dark"
                 />
-                <p className="mt-4 font-heading text-lg font-medium text-navy">
+                <p className="mt-4 font-heading text-lg font-medium text-ink">
                   Card title
                 </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-700">
+                <p className="mt-1 text-sm leading-relaxed text-ink-2">
                   Hover me — border tint + shadow lift, 200ms ease-out. Note the
                   8px corner ticks.
                 </p>
@@ -114,14 +115,14 @@ export default function KitchenSinkPage() {
             title="Headings use Sora, body uses Inter"
           />
           <div className="mt-8 space-y-4">
-            <p className="text-6xl leading-tight tracking-tight text-navy">6xl display</p>
-            <p className="text-5xl leading-tight tracking-tight text-navy">5xl display</p>
-            <p className="text-4xl leading-tight tracking-tight text-navy">4xl heading</p>
-            <p className="text-2xl text-navy">2xl heading</p>
-            <p className="text-xl text-navy">xl heading</p>
+            <p className="text-6xl font-light leading-tight text-ink">6xl display</p>
+            <p className="text-5xl font-light leading-tight text-ink">5xl display</p>
+            <p className="text-4xl font-light leading-tight text-ink">4xl heading</p>
+            <p className="text-2xl font-light text-ink">2xl heading</p>
+            <p className="text-xl text-ink">xl heading</p>
             <p className="text-lg leading-relaxed">lg body — leading-relaxed</p>
             <p className="text-base leading-relaxed">base body — minimum grey-700 on white</p>
-            <p className="font-mono text-sm text-slate-500">sm mono — index labels</p>
+            <p className="text-sm text-ink-3">sm mono — index labels</p>
           </div>
         </Container>
       </Section>

@@ -10,22 +10,22 @@ export const metadata: Metadata = {
     "Plain-spoken writing on audit, security, and automation from the Accurith team.",
 };
 
-// Blog index — Direction B. Page header, then the featured post as the same
-// editorial split used on the home page (image left, kicker + display title
-// right), then the remaining posts as hairline-ruled rows.
+// Blog index — Direction C. Dark page-header band, then the featured post as
+// the same editorial split used on the home page (image left, kicker + display
+// title right), then the remaining posts as hairline-ruled rows.
 export default function BlogPage() {
   return (
     <>
-      {/* Page header */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-content px-6 pb-16 pt-16 md:px-12 md:pb-20 md:pt-24">
-          <p className="font-mono text-xs uppercase tracking-kicker text-accent">
+      {/* Page header — full-width dark band */}
+      <section className="bg-hero text-white">
+        <div className="mx-auto max-w-content px-6 py-20 md:px-12 md:py-28">
+          <p className="text-[11px] font-semibold uppercase tracking-label text-accent-light">
             Blog
           </p>
-          <h1 className="mt-5 max-w-3xl font-heading text-4xl font-extrabold leading-[1.05] tracking-tighter text-ink md:text-5xl">
+          <h1 className="mt-5 max-w-3xl font-heading text-4xl font-light leading-[1.1] text-white md:text-5xl">
             Notes from the practice
           </h1>
-          <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-ink-2">
+          <p className="mt-6 max-w-2xl text-[17px] leading-relaxed text-white/70">
             Plain-spoken writing on audit, security, and automation — the
             things we explain to clients most often, written down once.
           </p>
@@ -47,29 +47,29 @@ export default function BlogPage() {
             )}
           </div>
           <div className="flex flex-col justify-center px-6 py-16 md:px-16 md:py-24">
-            <p className="font-mono text-xs uppercase tracking-kicker text-accent">
+            <p className="text-[11px] font-semibold uppercase tracking-label text-accent-dark">
               Featured
             </p>
             <h2
               id="featured-post-heading"
-              className="mt-5 font-heading text-3xl font-extrabold leading-[1.05] tracking-tighter text-ink md:text-4xl"
+              className="mt-5 font-heading text-3xl font-light leading-[1.1] text-ink md:text-4xl"
             >
               {featuredPost.title}
             </h2>
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-ink-2">
               {featuredPost.excerpt}
             </p>
-            <p className="mt-6 font-mono text-xs uppercase tracking-kicker text-ink-3">
+            <p className="mt-6 text-[11px] uppercase tracking-label text-ink-3">
               {featuredPost.date} · {featuredPost.readTime}
             </p>
             <Link
               href={`/blog/${featuredPost.slug}`}
-              className="mt-8 inline-flex min-h-11 items-center gap-3.5 self-start rounded-lg"
+              className="mt-8 inline-flex min-h-11 items-center gap-3.5 self-start"
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-sm bg-accent text-white">
                 <ArrowRight aria-hidden="true" size={16} strokeWidth={2} />
               </span>
-              <span className="font-mono text-[13px] uppercase tracking-kicker text-ink">
+              <span className="text-[12px] font-semibold uppercase tracking-cta text-ink">
                 Read the analysis
               </span>
             </Link>
@@ -82,7 +82,7 @@ export default function BlogPage() {
         <div className="mx-auto max-w-content px-6 py-20 md:px-12 md:py-24">
           <p
             id="all-posts-heading"
-            className="mb-10 font-mono text-xs uppercase tracking-kicker text-accent"
+            className="mb-10 text-[11px] font-semibold uppercase tracking-label text-accent-dark"
           >
             All posts
           </p>
@@ -94,10 +94,10 @@ export default function BlogPage() {
                   className="group flex flex-col gap-3 py-8 transition-[padding] duration-200 motion-safe:hover:pl-3 md:flex-row md:items-baseline md:justify-between md:gap-10"
                 >
                   <span className="flex flex-col gap-3 md:max-w-2xl">
-                    <span className="font-mono text-xs uppercase tracking-kicker text-ink-3">
+                    <span className="text-[11px] uppercase tracking-label text-ink-3">
                       {post.category} · {post.date} · {post.readTime}
                     </span>
-                    <span className="font-heading text-2xl font-bold tracking-tighter text-ink group-hover:text-accent md:text-3xl">
+                    <span className="font-heading text-2xl font-light text-ink group-hover:text-accent-dark md:text-3xl">
                       {post.title}
                     </span>
                     <span className="text-[15px] leading-relaxed text-ink-3">
@@ -117,7 +117,7 @@ export default function BlogPage() {
             lands here first. Questions about anything we&apos;ve written?{" "}
             <Link
               href="/contact"
-              className="text-accent underline-offset-4 hover:underline"
+              className="text-accent-dark underline-offset-4 hover:underline"
             >
               Talk to us
             </Link>

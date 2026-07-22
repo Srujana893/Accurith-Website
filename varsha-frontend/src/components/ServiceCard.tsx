@@ -3,8 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "./ui/cn";
 import type { Service } from "./siteData";
 
-// Precision-hover: border tint + shadow lift, 200ms ease-out. Featured cards
-// get the corner-tick treatment (signature element 1).
+// Direction C service card — sharp hairline card, accent icon, caps
+// "Learn more" affordance. Hover: accent border, no lift.
 export default function ServiceCard({
   service,
   className,
@@ -17,28 +17,27 @@ export default function ServiceCard({
     <Link
       href={`/services/${service.slug}`}
       className={cn(
-        "group flex flex-col rounded-lg border border-slate-200 bg-white p-6 transition-all duration-200 ease-out hover:border-teal-300 hover:shadow-md",
-        service.featured && "corner-ticks",
+        "group flex flex-col border border-line-light bg-white p-7 transition-colors duration-200 ease-out hover:border-accent",
         className,
       )}
     >
       <Icon
         aria-hidden="true"
         size={24}
-        strokeWidth={1.75}
-        className="text-teal-700"
+        strokeWidth={1.5}
+        className="text-accent-dark"
       />
-      <h3 className="mt-4 font-heading text-lg font-medium text-navy">
+      <h3 className="mt-5 font-heading text-lg font-normal text-ink">
         {service.name}
       </h3>
-      <p className="mt-1 flex-1 text-sm leading-relaxed text-slate-700">
+      <p className="mt-2 flex-1 text-sm font-light leading-relaxed text-ink-2">
         {service.shortDescription}
       </p>
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-teal-700 group-hover:text-teal-800">
+      <span className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-label text-accent-dark group-hover:text-accent">
         Learn more
         <ArrowRight
           aria-hidden="true"
-          size={16}
+          size={14}
           strokeWidth={1.75}
           className="transition-transform duration-200 group-hover:translate-x-0.5"
         />

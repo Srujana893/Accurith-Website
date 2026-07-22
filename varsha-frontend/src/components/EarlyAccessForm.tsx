@@ -9,7 +9,7 @@ import { submitEarlyAccess } from "@/mocks/earlyAccess";
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const inputClasses =
-  "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-dark placeholder:text-slate-500 transition-colors duration-200 hover:border-slate-400";
+  "w-full border border-line-light bg-white px-4 py-3 text-base text-ink placeholder:text-ink-3 transition-colors duration-200 hover:border-ink-3 focus:border-accent focus:outline-none";
 
 // V24 — simple early-access form against the mocked endpoint. Append ?fail
 // to the URL to demo the error state.
@@ -28,16 +28,16 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
     return (
       <div
         role="status"
-        className="rounded-lg border border-teal-300 bg-teal-50 p-6 text-left"
+        className="border border-accent/40 bg-sec1 p-6 text-left"
       >
         <CheckCircle2
           aria-hidden="true"
           size={24}
           strokeWidth={1.75}
-          className="text-teal-700"
+          className="text-accent-dark"
         />
-        <h3 className="mt-3 text-xl text-navy">You&apos;re on the list.</h3>
-        <p className="mt-1 text-sm leading-relaxed text-slate-700">
+        <h3 className="mt-3 text-xl font-light text-ink">You&apos;re on the list.</h3>
+        <p className="mt-1 text-sm leading-relaxed text-ink-2">
           We&apos;ll write to you when early access opens — and not before,
           and not about anything else.
         </p>
@@ -49,7 +49,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
     <form onSubmit={handleSubmit} className="text-left">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="ea-name" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="ea-name" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Name
           </label>
           <input
@@ -63,7 +63,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
           />
         </div>
         <div>
-          <label htmlFor="ea-email" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="ea-email" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Work email
           </label>
           <input
@@ -77,7 +77,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
           />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="ea-product" className="mb-1.5 block text-sm font-medium text-navy">
+          <label htmlFor="ea-product" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Product of interest
           </label>
           <select
@@ -87,7 +87,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
             onChange={(e) =>
               setForm((f) => ({ ...f, product: e.target.value }))
             }
-            className={cn(inputClasses, form.product === "" && "text-slate-500")}
+            className={cn(inputClasses, form.product === "" && "text-ink-3")}
           >
             <option value="" disabled>
               Select a product…
@@ -104,7 +104,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
       {status === "error" && (
         <div
           role="alert"
-          className="mt-4 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-4"
+          className="mt-4 flex items-start gap-3 border border-red-300 bg-red-50 p-4"
         >
           <CircleAlert
             aria-hidden="true"

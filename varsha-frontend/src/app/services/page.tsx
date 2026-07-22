@@ -20,20 +20,20 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      <Section tone="white" hairline={false} dotGrid className="md:py-28">
+      <section className="bg-hero py-20 text-white md:py-28">
         <Container>
-          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-teal-700">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-label text-accent-light">
             Services
           </p>
-          <h1 className="max-w-3xl text-4xl leading-tight tracking-tight md:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-tight text-white md:text-5xl">
             One firm across audit, security, and automation
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-white/80">
             Six service lines, one method: scope precisely, test properly, and
             leave you with evidence — not just opinions.
           </p>
         </Container>
-      </Section>
+      </section>
 
       <Section tone="grey">
         <Container>
@@ -63,10 +63,10 @@ export default function ServicesPage() {
 
       <Section tone="grey">
         <Container className="max-w-3xl text-center">
-          <h2 className="text-2xl leading-tight tracking-tight md:text-4xl">
+          <h2 className="text-2xl font-light leading-tight text-ink md:text-4xl">
             Not sure where to start?
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-slate-700">
+          <p className="mt-4 text-lg leading-relaxed text-ink-2">
             Describe the problem — an upcoming audit, a security concern, a
             board question — and we&apos;ll scope the right entry point.
           </p>

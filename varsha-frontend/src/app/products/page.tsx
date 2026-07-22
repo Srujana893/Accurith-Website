@@ -39,22 +39,22 @@ const products = [
 export default function ProductsPage() {
   return (
     <>
-      <Section tone="white" hairline={false} dotGrid className="md:py-28">
+      <section className="bg-hero py-20 text-white md:py-28">
         <Container>
-          <Badge mono className="mb-4">
+          <Badge mono tone="navy" className="mb-4">
             Launching soon
           </Badge>
-          <h1 className="max-w-3xl text-4xl leading-tight tracking-tight md:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-tight text-white md:text-5xl">
             The platforms behind our practice
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
             We&apos;re productising the automation we use in our own
             engagements. The platforms below are in testing with early users
             now — no public screenshots or pricing until they&apos;ve earned
             them.
           </p>
         </Container>
-      </Section>
+      </section>
 
       <Section tone="grey">
         <Container>
@@ -63,19 +63,19 @@ export default function ProductsPage() {
             {products.map((p) => (
               <div
                 key={p.name}
-                className="corner-ticks flex flex-col rounded-lg border border-slate-200 bg-white p-6 transition-all duration-200 ease-out hover:border-teal-300 hover:shadow-md"
+                className="corner-ticks flex flex-col border border-line-light bg-white p-6 transition-all duration-200 ease-out hover:border-accent/40 hover:shadow-md"
               >
                 <div className="flex items-start justify-between">
                   <p.icon
                     aria-hidden="true"
                     size={24}
                     strokeWidth={1.75}
-                    className="text-teal-700"
+                    className="text-accent-dark"
                   />
                   <Badge mono>Coming soon</Badge>
                 </div>
-                <h3 className="mt-4 text-lg font-medium text-navy">{p.name}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-slate-700">
+                <h3 className="mt-4 text-lg font-medium text-ink">{p.name}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-ink-2">
                   {p.description}
                 </p>
               </div>

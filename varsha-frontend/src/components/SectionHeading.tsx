@@ -1,7 +1,8 @@
 import { cn } from "./ui/cn";
 
-// Signature element 1c — small mono-font index label ("01 / Services") above
-// section headings.
+// Direction C section heading — caps letterspaced label above a light-weight
+// display title (the A&M kicker move). `index` renders before the label as
+// "01 / Services" where pages pass it.
 export default function SectionHeading({
   index,
   label,
@@ -29,21 +30,22 @@ export default function SectionHeading({
         className,
       )}
     >
-      {index && (
+      {(index || label) && (
         <p
           className={cn(
-            "mb-3 font-mono text-xs uppercase tracking-widest",
-            onNavy ? "text-teal-300" : "text-teal-700",
+            "mb-4 text-[11px] font-semibold uppercase tracking-label",
+            onNavy ? "text-accent-light" : "text-accent-dark",
           )}
         >
           {index}
-          {label ? ` / ${label}` : ""}
+          {index && label ? " / " : ""}
+          {label}
         </p>
       )}
       <h2
         className={cn(
-          "text-2xl leading-tight tracking-tight md:text-4xl",
-          onNavy && "text-white",
+          "text-3xl font-light leading-tight md:text-4xl",
+          onNavy ? "text-white" : "text-ink",
         )}
       >
         {title}
@@ -51,8 +53,8 @@ export default function SectionHeading({
       {description && (
         <p
           className={cn(
-            "mt-4 text-lg leading-relaxed",
-            onNavy ? "text-slate-300" : "text-slate-700",
+            "mt-4 text-lg font-light leading-relaxed",
+            onNavy ? "text-white/70" : "text-ink-2",
           )}
         >
           {description}

@@ -33,11 +33,12 @@
 }
 
 @layer utilities {
-  /* Signature element 1a — sparse teal dot-grid, whisper-quiet (~4–6% opacity). */
+  /* Legacy Direction A dot-grid, recolored to the Direction C accent —
+     whisper-quiet (~4–6% opacity); only still referenced by unreskinned spots. */
   .bg-audit-grid {
     background-image: radial-gradient(
       circle,
-      theme(colors.teal.600 / 7%) 1px,
+      theme(colors.accent.DEFAULT / 6%) 1px,
       transparent 1px
     );
     background-size: 28px 28px;
@@ -45,7 +46,7 @@
   .bg-audit-grid-navy {
     background-image: radial-gradient(
       circle,
-      theme(colors.teal.300 / 8%) 1px,
+      theme(colors.accent.light / 8%) 1px,
       transparent 1px
     );
     background-size: 28px 28px;
@@ -53,7 +54,7 @@
 }
 
 @layer components {
-  /* Signature element 1b — tiny 8px corner-tick marks on featured cards. */
+  /* Legacy corner-tick marks, recolored to the Direction C accent. */
   .corner-ticks {
     position: relative;
   }
@@ -63,7 +64,7 @@
     position: absolute;
     width: theme(spacing.2);
     height: theme(spacing.2);
-    border-color: theme(colors.teal.600 / 60%);
+    border-color: theme(colors.accent.DEFAULT / 50%);
     pointer-events: none;
   }
   .corner-ticks::before {

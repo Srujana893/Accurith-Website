@@ -38,27 +38,27 @@ const leadershipPlaceholders = [
 export default function AboutPage() {
   return (
     <>
-      <Section tone="white" hairline={false} dotGrid className="md:py-28">
+      <section className="bg-hero py-20 text-white md:py-28">
         <Container>
-          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-teal-700">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-label text-accent-light">
             About
           </p>
-          <h1 className="max-w-3xl text-4xl leading-tight tracking-tight md:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-tight text-white md:text-5xl">
             A new firm, built on old-fashioned rigour
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
             Accurith Technologies Private Limited is a cybersecurity, IS-audit,
             and GRC advisory firm based in Bengaluru, India. We started
             Accurith because assurance work deserves both discipline and
             better tooling — so we deliver the first and build the second.
           </p>
         </Container>
-      </Section>
+      </section>
 
       <Section tone="grey">
         <Container className="max-w-3xl">
           <SectionHeading index="01" label="Mission" title="What we're here to do" />
-          <p className="mt-6 text-lg leading-relaxed text-slate-700">
+          <p className="mt-6 text-lg leading-relaxed text-ink-2">
             Help organisations prove their controls work — to auditors,
             regulators, customers, and themselves — and automate the parts of
             that proof that never needed a human in the first place. We
@@ -70,7 +70,7 @@ export default function AboutPage() {
       {/* Signature element 3 — credentials where a competitor's logo wall goes */}
       <Section tone="white" className="py-10 md:py-12">
         <Container className="text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-label text-ink-3">
             Credentials held across our leadership team
           </p>
           <ul className="mt-4 flex flex-wrap items-center justify-center gap-3">
@@ -97,11 +97,11 @@ export default function AboutPage() {
             {leadershipPlaceholders.map((person) => (
               <div
                 key={person.title}
-                className="corner-ticks rounded-lg border border-slate-200 bg-white p-6"
+                className="corner-ticks border border-line-light bg-white p-6"
               >
                 <div
                   aria-hidden="true"
-                  className="flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100 text-slate-400"
+                  className="flex h-16 w-16 items-center justify-center bg-sec1 text-ink-3"
                 >
                   <UserRound size={24} strokeWidth={1.75} />
                 </div>
@@ -113,13 +113,13 @@ export default function AboutPage() {
                     </li>
                   ))}
                 </ul>
-                <h3 className="mt-3 text-lg font-medium text-navy">
+                <h3 className="mt-3 text-lg font-medium text-ink">
                   {person.title}
                 </h3>
-                <p className="font-mono text-xs uppercase tracking-widest text-slate-500">
+                <p className="text-[11px] font-semibold uppercase tracking-label text-ink-3">
                   Placeholder profile
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                <p className="mt-2 text-sm leading-relaxed text-ink-2">
                   {person.bio}
                 </p>
               </div>
@@ -130,10 +130,10 @@ export default function AboutPage() {
 
       <Section tone="white">
         <Container className="max-w-3xl text-center">
-          <h2 className="text-2xl leading-tight tracking-tight md:text-4xl">
+          <h2 className="text-2xl font-light leading-tight text-ink md:text-4xl">
             Work with us — or for us
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-slate-700">
+          <p className="mt-4 text-lg leading-relaxed text-ink-2">
             We&apos;re building a firm and a team at the same time.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">

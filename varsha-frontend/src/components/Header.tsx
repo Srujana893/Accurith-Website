@@ -254,7 +254,7 @@ export default function Header() {
             {primaryNav.map((item) =>
               item.children ? (
                 <div key={item.label} className="mb-6">
-                  <p className="mb-2 px-3 font-mono text-xs uppercase tracking-kicker text-ink-3">
+                  <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-label text-ink-3">
                     {item.label}
                   </p>
                   <ul className="space-y-1">
