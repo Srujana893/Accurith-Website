@@ -6,6 +6,7 @@ export type HeroSlide = {
   kicker: string;
   title: string;
   summary: string;
+  image: string; // small inset art card (kept per client, 2026-07-22)
   href: string;
   cta: string;
 };
@@ -18,6 +19,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Assurance, Cyber Security and Risk Advisory, Built on Evidence",
     summary:
       "Six connected practices helping organisations answer to RBI, SEBI, IRDAI, CERT-In and the DPDP Act — every finding documented to the standard a regulator, board or court will accept.",
+    image: "/images/home/hero-monument.jpg",
     href: "/services",
     cta: "What we do",
   },
@@ -26,6 +28,7 @@ export const heroSlides: HeroSlide[] = [
     title: "IS & IT Audit, Built for the Regulator's Desk",
     summary:
       "IS audits mapped to RBI ITGRCA, SEBI CSCRF and IRDAI — with findings and evidence a regulator will accept.",
+    image: "/images/home/hero-audit.jpg",
     href: "/services/is-it-audit",
     cta: "Explore more",
   },
@@ -34,6 +37,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Security Testing That Stands Up to Scrutiny",
     summary:
       "CERT-In-aligned security audits, VAPT and resilience testing — documented to a standard that stands up to scrutiny.",
+    image: "/images/home/hero-cyber.jpg",
     href: "/services/cyber-security",
     cta: "Explore more",
   },
@@ -42,6 +46,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Risk, GRC & Forensics on One Evidence Trail",
     summary:
       "ISO 27001, SOC 2, internal controls, DPDP readiness and FAFD-led digital forensics with defensible chain-of-custody.",
+    image: "/images/home/hero-forensics.jpg",
     href: "/services/risk-grc-advisory",
     cta: "Explore more",
   },

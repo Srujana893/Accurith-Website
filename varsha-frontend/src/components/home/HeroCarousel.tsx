@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { cn } from "../ui/cn";
@@ -59,33 +60,49 @@ export default function HeroCarousel() {
 
       {/* active slide — keyed so the rise animation restarts */}
       <div className="relative z-20 mx-auto flex h-full min-h-[45rem] max-w-content items-center px-6 pb-32 pt-28 md:px-12 lg:h-screen">
-        <div key={current.title} className="anim-rise w-full">
-          <p className="text-[11px] font-semibold uppercase tracking-label text-accent-light">
-            {current.kicker}
-          </p>
-          <h1 className="mt-6 max-w-5xl font-heading text-4xl font-light leading-[1.08] text-white sm:text-5xl xl:text-[4.25rem]">
-            {current.title}
-          </h1>
-          <div className="mt-8 h-px w-full max-w-xl bg-white/55" />
-          <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/90">
-            {current.summary}
-          </p>
-          <Link
-            href={current.href}
-            className="group mt-10 inline-flex min-h-12 items-center gap-4"
-          >
-            <span className="flex h-11 w-11 items-center justify-center bg-accent transition-colors duration-200 group-hover:bg-accent-hover">
-              <Play
-                aria-hidden="true"
-                size={14}
-                strokeWidth={0}
-                className="fill-white"
-              />
-            </span>
-            <span className="text-xs font-semibold uppercase tracking-cta text-white">
-              {current.cta}
-            </span>
-          </Link>
+        <div
+          key={current.title}
+          className="anim-rise grid w-full items-center gap-10 lg:grid-cols-[21rem_1fr] lg:gap-16"
+        >
+          {/* small inset art card (kept per client, 2026-07-22) */}
+          <div className="relative hidden aspect-[10/11] w-full overflow-hidden shadow-2xl shadow-black/50 lg:block">
+            <Image
+              src={current.image}
+              alt=""
+              fill
+              sizes="21rem"
+              className="object-cover"
+            />
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-label text-accent-light">
+              {current.kicker}
+            </p>
+            <h1 className="mt-6 max-w-4xl font-heading text-4xl font-light leading-[1.08] text-white sm:text-5xl xl:text-6xl">
+              {current.title}
+            </h1>
+            <div className="mt-8 h-px w-full max-w-xl bg-white/55" />
+            <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/90">
+              {current.summary}
+            </p>
+            <Link
+              href={current.href}
+              className="group mt-10 inline-flex min-h-12 items-center gap-4"
+            >
+              <span className="flex h-11 w-11 items-center justify-center bg-accent transition-colors duration-200 group-hover:bg-accent-hover">
+                <Play
+                  aria-hidden="true"
+                  size={14}
+                  strokeWidth={0}
+                  className="fill-white"
+                />
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-cta text-white">
+                {current.cta}
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
 
