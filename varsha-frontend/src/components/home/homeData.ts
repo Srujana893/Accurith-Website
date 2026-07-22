@@ -53,8 +53,16 @@ export const heroSlides: HeroSlide[] = [
 ];
 
 // Expertise tiles — all six service lines, linking to their real pages.
-// Tiles without an image render on the flat deep-navy ground.
-export const expertise = [
+// Tiles 03/06 crop opposite ends of the wide skyline artwork (imagePos) so
+// all six read as photo tiles without repeating a frame.
+export const expertise: {
+  no: string;
+  title: string;
+  desc: string;
+  href: string;
+  image?: string;
+  imagePos?: "left" | "right";
+}[] = [
   {
     no: "01",
     title: "IS & IT Audit",
@@ -74,6 +82,8 @@ export const expertise = [
     title: "Risk & GRC",
     desc: "ISO 27001, SOC 2, NIST, COBIT and internal controls.",
     href: "/services/risk-grc-advisory",
+    image: "/images/home/hero-bg.jpg",
+    imagePos: "left",
   },
   {
     no: "04",
@@ -94,6 +104,8 @@ export const expertise = [
     title: "Managed Services",
     desc: "Ongoing security and compliance operations, as a service.",
     href: "/services/managed-services",
+    image: "/images/home/hero-bg.jpg",
+    imagePos: "right",
   },
 ];
 

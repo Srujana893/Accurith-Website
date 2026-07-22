@@ -1,10 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "../ui/cn";
 import { expertise } from "./homeData";
 
-// "What we do" — Direction C photo-tile grid. Six tiles on a hairline grid:
-// photo tiles carry the service artwork under a bottom-heavy shade; tiles
-// without art sit on the flat deep-navy ground. Caps title, accent bar, desc.
+// "What we do" — Direction C photo-tile grid. Six tiles on a hairline grid,
+// each carrying service artwork under a bottom-heavy shade. Caps title,
+// accent bar, desc. imagePos picks the crop for tiles sharing the wide
+// skyline artwork (static class map — no style=, CSP posture).
+const posClasses = { left: "object-left", right: "object-right" } as const;
 export default function ExpertiseList() {
   return (
     <section className="bg-white">
@@ -39,7 +42,10 @@ export default function ExpertiseList() {
                     alt=""
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
+                    className={cn(
+                      "object-cover transition-transform duration-500 motion-safe:group-hover:scale-105",
+                      e.imagePos && posClasses[e.imagePos],
+                    )}
                   />
                 )}
                 <span className="absolute inset-0 bg-gradient-to-b from-hero/10 via-hero/30 to-hero/90" />
