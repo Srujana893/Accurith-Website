@@ -1,12 +1,12 @@
-// Homepage content — Direction B design handoff (2026-07-21). Copy is
-// client-approved and obeys the house rules: no invented metrics, only real
+// Homepage content — Direction C "Marsal" (client-approved mockup,
+// 2026-07-22). Copy obeys the house rules: no invented metrics, only real
 // credentials (DISA · FAFD · ISC2 CC · DPCAC), frameworks as plain text.
 
 export type HeroSlide = {
   kicker: string;
   title: string;
   summary: string;
-  image: string; // insight-strip card art (hero bg itself is fixed)
+  image: string; // inset art card, A&M-style (hero bg itself is fixed)
   href: string;
   cta: string;
 };
@@ -20,11 +20,11 @@ export const heroSlides: HeroSlide[] = [
       "Explore how agentic AI is reshaping operating models to unlock faster decision-making, improved resilience, and scalable business impact.",
     image: "/images/home/hero-monument.jpg",
     href: "/services/ai-automation",
-    cta: "Explore more",
+    cta: "Read more",
   },
   {
     kicker: "What we do · IS/IT Audit",
-    title: "IS & IT Audit",
+    title: "IS & IT Audit, Built for the Regulator's Desk",
     summary:
       "IS audits mapped to RBI ITGRCA, SEBI CSCRF and IRDAI — with findings and evidence a regulator will accept.",
     image: "/images/home/hero-audit.jpg",
@@ -33,7 +33,7 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     kicker: "What we do · Cyber Security",
-    title: "Cyber Security",
+    title: "Security Testing That Stands Up to Scrutiny",
     summary:
       "CERT-In-aligned security audits, VAPT and resilience testing — documented to a standard that stands up to scrutiny.",
     image: "/images/home/hero-cyber.jpg",
@@ -42,7 +42,7 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     kicker: "What we do · Risk, GRC & Forensics",
-    title: "Risk, GRC & Forensics",
+    title: "Risk, GRC & Forensics on One Evidence Trail",
     summary:
       "ISO 27001, SOC 2, internal controls, DPDP readiness and FAFD-led digital forensics with defensible chain-of-custody.",
     image: "/images/home/hero-forensics.jpg",
@@ -51,19 +51,22 @@ export const heroSlides: HeroSlide[] = [
   },
 ];
 
-// Large hover rows — all six service lines, linking to their real pages.
+// Expertise tiles — all six service lines, linking to their real pages.
+// Tiles without an image render on the flat deep-navy ground.
 export const expertise = [
   {
     no: "01",
     title: "IS & IT Audit",
     desc: "RBI ITGRCA, SEBI CSCRF and IRDAI assurance, evidence attached.",
     href: "/services/is-it-audit",
+    image: "/images/home/hero-audit.jpg",
   },
   {
     no: "02",
     title: "Cyber Security",
     desc: "CERT-In-aligned security audits, VAPT and resilience testing.",
     href: "/services/cyber-security",
+    image: "/images/home/hero-cyber.jpg",
   },
   {
     no: "03",
@@ -76,12 +79,14 @@ export const expertise = [
     title: "AI Automation",
     desc: "Evidence collection, monitoring and workpaper drafting.",
     href: "/services/ai-automation",
+    image: "/images/home/hero-monument.jpg",
   },
   {
     no: "05",
     title: "Digital Forensics",
     desc: "Fraud examination and defensible chain-of-custody.",
     href: "/services/digital-forensics",
+    image: "/images/home/hero-forensics.jpg",
   },
   {
     no: "06",

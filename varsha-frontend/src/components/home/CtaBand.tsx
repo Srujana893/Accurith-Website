@@ -1,38 +1,23 @@
-import Image from "next/image";
-import Link from "next/link";
+import CtaLink from "../ui/CtaLink";
 
-// Full-bleed CTA band — image + dark→accent gradient wash, two actions.
-// Both routes go to /contact where the consultation form lives.
+// Direction C closing CTA — quiet, centered, white. One action: the
+// consultation form on /contact. Response promise per the build plan.
 export default function CtaBand() {
   return (
-    <section className="relative overflow-hidden bg-base">
-      <div className="absolute inset-0">
-        <Image
-          src="/images/home/cta-band.png"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-tr from-footer via-base/90 to-accent/40" />
-      </div>
-      <div className="relative z-10 mx-auto max-w-content px-6 py-28 text-center md:px-12">
-        <h2 className="mx-auto max-w-3xl font-heading text-3xl font-extrabold leading-[1.05] tracking-tighter text-white md:text-5xl">
-          See it run against the regulator you answer to.
+    <section className="bg-white">
+      <div className="mx-auto max-w-content px-6 py-24 text-center md:px-12 md:py-28">
+        <p className="text-[11px] font-semibold uppercase tracking-label text-accent-dark">
+          Contact
+        </p>
+        <h2 className="mx-auto mt-4 max-w-2xl font-heading text-3xl font-light text-ink md:text-5xl">
+          Book a Consultation
         </h2>
-        <div className="mt-9 flex flex-wrap justify-center gap-3.5">
-          <Link
-            href="/contact"
-            className="inline-flex min-h-12 items-center rounded-lg bg-white px-7 text-[15px] font-bold text-footer transition-colors duration-200 hover:bg-sec2"
-          >
-            Request a Demo
-          </Link>
-          <Link
-            href="/contact"
-            className="inline-flex min-h-12 items-center rounded-lg border border-white/70 px-7 text-[15px] font-bold text-white transition-colors duration-200 hover:border-white"
-          >
-            Book a consultation
-          </Link>
+        <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-2">
+          Tell us what you&apos;re answering to — a regulator, a board, or a
+          breach. We respond within one business day.
+        </p>
+        <div className="mt-10 flex justify-center">
+          <CtaLink href="/contact">Get in Touch</CtaLink>
         </div>
       </div>
     </section>

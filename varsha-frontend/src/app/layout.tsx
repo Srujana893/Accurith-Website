@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TransparencyBand from "@/components/TransparencyBand";
 import "@/styles/globals.css";
 
-// V02 — self-hosted via next/font, no external font requests at runtime.
-// Direction B type stack: Archivo display, IBM Plex Sans body, Plex Mono labels.
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
-const plexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plex-sans",
-});
+// Direction C type stack is system Helvetica Neue (see tailwind.config.ts) —
+// no webfont needed for display/body. Plex Mono stays self-hosted via
+// next/font for legacy inner-page labels only.
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
@@ -40,9 +35,7 @@ export default function RootLayout({
     <html lang="en">
       {/* TODO(S-track): cookie-consent script, privacy-first analytics
           (Plausible/Umami), and JSON-LD organization schema mount here. */}
-      <body
-        className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable} font-body`}
-      >
+      <body className={`${plexMono.variable} font-body`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-navy focus:shadow-lg"

@@ -1,43 +1,64 @@
+import Image from "next/image";
 import Link from "next/link";
 import { expertise } from "./homeData";
 
-// "What we do" — large hover rows, one per service line. Hover nudges the
-// row right 12px (disabled under reduced motion via motion-safe).
+// "What we do" — Direction C photo-tile grid. Six tiles on a hairline grid:
+// photo tiles carry the service artwork under a bottom-heavy shade; tiles
+// without art sit on the flat deep-navy ground. Caps title, accent bar, desc.
 export default function ExpertiseList() {
   return (
-    <section className="bg-sec1">
-      <div className="mx-auto max-w-content px-6 py-24 md:px-12">
-        <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <p className="font-mono text-xs uppercase tracking-kicker text-accent">
-            What we do
-          </p>
-          <p className="max-w-sm text-[15px] text-ink-3 sm:text-right">
-            Audit, risk and forensic expertise paired with AI automation.
-          </p>
+    <section className="bg-white">
+      <div className="mx-auto max-w-content px-6 pb-24 md:px-12 md:pb-28">
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-label text-accent-dark">
+              Expertise
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-light text-ink md:text-4xl">
+              What We Do
+            </h2>
+          </div>
+          <Link
+            href="/services"
+            className="inline-flex min-h-11 items-center text-xs font-semibold uppercase tracking-label text-accent-dark transition-colors duration-200 hover:text-accent"
+          >
+            All Services&ensp;›
+          </Link>
         </div>
-        <ul>
+
+        <ul className="grid gap-0.5 bg-line-light sm:grid-cols-2 lg:grid-cols-3">
           {expertise.map((e) => (
-            <li key={e.no} className="border-t border-line-light">
+            <li key={e.no} className="group relative">
               <Link
                 href={e.href}
-                className="flex flex-col gap-2 py-7 transition-[padding] duration-200 motion-safe:hover:pl-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+                className="relative block aspect-[4/3.4] overflow-hidden bg-navy"
               >
-                <span className="flex items-baseline gap-5">
-                  <span className="font-mono text-[13px] text-ink-3">
+                {e.image && (
+                  <Image
+                    src={e.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
+                  />
+                )}
+                <span className="absolute inset-0 bg-gradient-to-b from-hero/10 via-hero/30 to-hero/90" />
+                <span className="absolute inset-x-0 bottom-0 z-10 p-7">
+                  <span className="block text-[11px] font-semibold uppercase tracking-label text-white/60">
                     {e.no}
                   </span>
-                  <span className="font-heading text-2xl font-bold tracking-tighter text-ink md:text-4xl">
+                  <span className="mt-2 block font-heading text-xl font-normal uppercase tracking-kicker text-white">
                     {e.title}
                   </span>
-                </span>
-                <span className="max-w-sm text-[15px] text-ink-3">
-                  {e.desc}
+                  <span className="mt-3 block h-0.5 w-9 bg-accent" />
+                  <span className="mt-3 block max-w-xs text-sm font-light leading-relaxed text-white/85">
+                    {e.desc}
+                  </span>
                 </span>
               </Link>
             </li>
           ))}
         </ul>
-        <div className="border-t border-line-light" />
       </div>
     </section>
   );

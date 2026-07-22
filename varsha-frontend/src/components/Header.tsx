@@ -114,9 +114,10 @@ export default function Header() {
   const isHome = pathname === "/";
   const dark = isHome && !mobileOpen;
 
+  // Direction C nav treatment — caps, letterspaced, thin (the A&M header).
   const navLinkClasses = (active: boolean) =>
     cn(
-      "rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200",
+      "rounded-sm px-3 py-2 text-xs font-medium uppercase tracking-kicker transition-colors duration-200",
       dark
         ? active
           ? "text-white"
@@ -217,7 +218,7 @@ export default function Header() {
         <div className="hidden lg:block">
           <Link
             href="/contact"
-            className="inline-flex min-h-10 items-center rounded-lg bg-accent px-5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover"
+            className="inline-flex min-h-10 items-center bg-accent px-5 text-xs font-semibold uppercase tracking-kicker text-white transition-colors duration-200 hover:bg-accent-hover"
           >
             Request a demo
           </Link>
@@ -288,7 +289,7 @@ export default function Header() {
             <div className="mt-6 border-t border-line-light pt-6">
               <Link
                 href="/contact"
-                className="flex min-h-12 items-center justify-center rounded-lg bg-accent px-5 text-base font-semibold text-white transition-colors duration-200 hover:bg-accent-hover"
+                className="flex min-h-12 items-center justify-center bg-accent px-5 text-sm font-semibold uppercase tracking-kicker text-white transition-colors duration-200 hover:bg-accent-hover"
               >
                 Request a demo
               </Link>

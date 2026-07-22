@@ -3,43 +3,42 @@ import type { Config } from "tailwindcss";
 // V01 — Design tokens. Every color, font, and radius the site uses lives here.
 // Rule: no hardcoded hex values or arbitrary spacing (p-[13px]) anywhere else.
 //
-// Direction B (locked 2026-07-21, client sign-off): blue accent, Archivo +
-// IBM Plex, "Charcoal" base theme, editorial full-bleed layout. The teal /
-// navy tokens below are the legacy Direction A system — still referenced by
-// not-yet-reskinned inner pages; delete them when the last teal page is
-// migrated.
+// Direction C "Marsal" (client-approved mockup, 2026-07-22): A&M-style
+// treatment — electric blue accent, Helvetica Neue light grotesque display,
+// photographic ink hero, caps letterspaced labels. The teal tokens below are
+// the legacy Direction A system — still referenced by not-yet-reskinned inner
+// pages; delete them when the last teal page is migrated.
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // ---- Direction B accent (client-selected blue). Ramp derived from
-        // the base via shade(): light +0.18, dark -0.28, hover +0.22.
-        // Contrast: accent on white 4.7:1 ✓; white on accent 4.7:1 ✓ (always
-        // white text on accent fills, never dark); accent on the dark base
-        // fails AA — use accent-light there (5.9:1 ✓).
+        // ---- Direction C accent — electric blue from the approved mockup.
+        // #0E8FDD on white is ~3.5:1: fine for fills and ≥19px text, NOT for
+        // small text on white — use accent-dark there (4.9:1 ✓). On dark
+        // grounds use accent-light for text (7.1:1 on ink ✓).
         accent: {
-          DEFAULT: "#2E6FE0",
-          light: "#5A90EC",
-          dark: "#2150A1",
-          hover: "#5A90EC",
+          DEFAULT: "#0E8FDD",
+          light: "#5FBAEE",
+          dark: "#0A6DA8",
+          hover: "#0B76B8",
         },
-        // ---- Base theme "Charcoal" — 7-tuple from the design handoff.
-        base: "#121417", // dark page/hero background
-        hero: "#071A2E", // hero navy — sampled from the 2026-07-22 brand artwork
-        footer: "#0C0D0F", // darkest — footer only
-        sec1: "#F5F5F6", // light section
-        sec2: "#ECEDEE", // alt light section
+        // ---- Base theme "Ink" — photo-overlay near-black + deep navy band.
+        base: "#121417", // dark page background (legacy inner pages)
+        hero: "#0A0E13", // ink — hero shade, careers band, footer ground
+        footer: "#0A0E13", // same ink as hero — one dark ground site-wide
+        sec1: "#F2F4F6", // cool light section
+        sec2: "#E9EDF0", // alt light section
         ink: {
-          DEFAULT: "#1B1D20", // heading on light
-          2: "#55585C", // body on light
-          3: "#6A6E73", // muted on light (4.7:1 on white ✓)
+          DEFAULT: "#1E242A", // heading on light
+          2: "#4C5761", // body on light
+          3: "#67717A", // muted on light (4.9:1 on white ✓)
         },
         // ---- Hairlines
         line: {
-          light: "#E2E8EC",
+          light: "#DDE2E7",
           dark: "#1C2733",
-          footer: "#18222E",
+          footer: "#1D2733",
         },
         // ---- Legacy Direction A tokens (teal audit-grid) — inner pages only.
         teal: {
@@ -61,21 +60,23 @@ const config: Config = {
           blue: "#3E8EFF",
         },
         navy: {
-          DEFAULT: "#1B2A4A",
+          DEFAULT: "#0E1B2E", // Direction C stats band / flat tiles
           light: "#2A3D66",
           dark: "#131E36",
         },
         dark: "#222222",
       },
       fontFamily: {
-        // Direction B type stack — Archivo display, IBM Plex Sans body,
-        // IBM Plex Mono kickers/labels.
-        heading: ["var(--font-archivo)", "system-ui", "sans-serif"],
-        body: ["var(--font-plex-sans)", "system-ui", "sans-serif"],
+        // Direction C type stack — Helvetica Neue light grotesque for display
+        // AND body (the A&M look); Plex Mono stays for legacy inner-page labels.
+        heading: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        body: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         mono: ["var(--font-plex-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       letterSpacing: {
         kicker: "0.16em",
+        label: "0.26em", // Direction C caps kickers / tile titles
+        cta: "0.34em", // Direction C READ MORE-style CTA text
         brand: "0.3em", // ACCURITH wordmark under the monogram
       },
       borderRadius: {
