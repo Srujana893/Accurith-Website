@@ -33,6 +33,57 @@
 }
 
 @layer utilities {
+  /* Direction C hero scene — abstract Big-4-style ground replacing the
+     monument photo (client request 2026-07-22): deep navy gradient, a faint
+     precision grid, two diagonal light beams and an accent glow. All colors
+     derive from theme tokens; layers stack via comma-separated backgrounds. */
+  .bg-hero-scene {
+    background-color: theme(colors.hero);
+    background-image:
+      /* fine audit grid, whisper-quiet */
+      repeating-linear-gradient(
+        0deg,
+        theme(colors.white / 2.5%) 0 1px,
+        transparent 1px 72px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        theme(colors.white / 2.5%) 0 1px,
+        transparent 1px 72px
+      ),
+      /* diagonal light beams */
+      linear-gradient(
+        112deg,
+        transparent 42%,
+        theme(colors.accent.DEFAULT / 7%) 50%,
+        transparent 58%
+      ),
+      linear-gradient(
+        112deg,
+        transparent 64%,
+        theme(colors.accent.light / 5%) 72%,
+        transparent 80%
+      ),
+      /* accent glow upper right + depth glow lower left */
+      radial-gradient(
+        ellipse 55% 65% at 78% 18%,
+        theme(colors.accent.DEFAULT / 22%),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 12% 96%,
+        theme(colors.navy.DEFAULT / 85%),
+        transparent 72%
+      ),
+      /* base navy→ink wash */
+      linear-gradient(
+        115deg,
+        theme(colors.navy.DEFAULT) 0%,
+        theme(colors.hero) 58%,
+        theme(colors.navy.dark) 100%
+      );
+  }
+
   /* Legacy Direction A dot-grid, recolored to the Direction C accent —
      whisper-quiet (~4–6% opacity); only still referenced by unreskinned spots. */
   .bg-audit-grid {

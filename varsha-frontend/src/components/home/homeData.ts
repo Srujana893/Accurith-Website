@@ -6,28 +6,26 @@ export type HeroSlide = {
   kicker: string;
   title: string;
   summary: string;
-  image: string; // inset art card, A&M-style (hero bg itself is fixed)
   href: string;
   cta: string;
 };
 
+// Slide 1 speaks for the company (client request 2026-07-22 — "talk about my
+// company", Big-4 style); the rest carry the practice lines.
 export const heroSlides: HeroSlide[] = [
   {
-    kicker: "Insights · Agentic AI",
-    title:
-      "From Automation to Autonomy: Redefining the Operating Model With Agentic AI",
+    kicker: "Accurith Technologies · Bengaluru",
+    title: "Assurance, Cyber Security and Risk Advisory, Built on Evidence",
     summary:
-      "Explore how agentic AI is reshaping operating models to unlock faster decision-making, improved resilience, and scalable business impact.",
-    image: "/images/home/hero-monument.jpg",
-    href: "/services/ai-automation",
-    cta: "Read more",
+      "Six connected practices helping organisations answer to RBI, SEBI, IRDAI, CERT-In and the DPDP Act — every finding documented to the standard a regulator, board or court will accept.",
+    href: "/services",
+    cta: "What we do",
   },
   {
     kicker: "What we do · IS/IT Audit",
     title: "IS & IT Audit, Built for the Regulator's Desk",
     summary:
       "IS audits mapped to RBI ITGRCA, SEBI CSCRF and IRDAI — with findings and evidence a regulator will accept.",
-    image: "/images/home/hero-audit.jpg",
     href: "/services/is-it-audit",
     cta: "Explore more",
   },
@@ -36,7 +34,6 @@ export const heroSlides: HeroSlide[] = [
     title: "Security Testing That Stands Up to Scrutiny",
     summary:
       "CERT-In-aligned security audits, VAPT and resilience testing — documented to a standard that stands up to scrutiny.",
-    image: "/images/home/hero-cyber.jpg",
     href: "/services/cyber-security",
     cta: "Explore more",
   },
@@ -45,7 +42,6 @@ export const heroSlides: HeroSlide[] = [
     title: "Risk, GRC & Forensics on One Evidence Trail",
     summary:
       "ISO 27001, SOC 2, internal controls, DPDP readiness and FAFD-led digital forensics with defensible chain-of-custody.",
-    image: "/images/home/hero-forensics.jpg",
     href: "/services/risk-grc-advisory",
     cta: "Explore more",
   },

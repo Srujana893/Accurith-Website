@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { cn } from "../ui/cn";
 import { heroSlides } from "./homeData";
 
-// Direction C hero — the A&M layout from the approved 2026-07-22 mockup:
-// fixed ink-photo background, inset art card LEFT + light-weight display
-// headline RIGHT of it, thin white hairline rule, summary, chip CTA. Bottom
-// chrome: centered "Scroll Down" with an accent progress track, bare chevron
-// arrows bottom-right. Auto-advances every 8s; paused on hover, off under
-// prefers-reduced-motion.
+// Direction C hero — abstract Big-4-style ground (bg-hero-scene) with
+// full-width light-weight display headline, thin white hairline rule,
+// summary, chip CTA. Slide 1 speaks for the company; the rest carry the
+// practice lines. Bottom chrome: centered "Scroll Down" with an accent
+// progress track, bare chevron arrows bottom-right. Auto-advances every 8s;
+// paused on hover, off under prefers-reduced-motion.
 
 const SLIDE_COUNT = heroSlides.length;
 // Static classes per slide index — house rule: no style= in shipped React.
@@ -54,65 +53,39 @@ export default function HeroCarousel() {
       onMouseLeave={() => setPaused(false)}
       className="relative min-h-[45rem] overflow-hidden bg-hero text-white lg:h-screen"
     >
-      {/* fixed background — the monument artwork, slides swap on top */}
-      <div className="absolute inset-0">
-        <Image
-          src="/images/home/hero-bg.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* A&M-style left-heavy shade so white copy always clears the art */}
-        <div className="absolute inset-0 bg-gradient-to-r from-hero/85 via-hero/55 to-hero/30" />
-      </div>
+      {/* abstract Big-4-style ground — navy gradient, precision grid, light
+          beams (no artwork; client dropped the monument photo 2026-07-22) */}
+      <div aria-hidden="true" className="absolute inset-0 bg-hero-scene" />
 
       {/* active slide — keyed so the rise animation restarts */}
       <div className="relative z-20 mx-auto flex h-full min-h-[45rem] max-w-content items-center px-6 pb-32 pt-28 md:px-12 lg:h-screen">
-        <div
-          key={current.title}
-          className="anim-rise grid w-full items-center gap-10 lg:grid-cols-[21rem_1fr] lg:gap-16"
-        >
-          {/* inset art card */}
-          <div className="relative hidden aspect-[10/11] w-full overflow-hidden shadow-2xl shadow-black/50 lg:block">
-            <Image
-              src={current.image}
-              alt=""
-              fill
-              sizes="21rem"
-              className="object-cover"
-            />
-          </div>
-
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-label text-accent-light">
-              {current.kicker}
-            </p>
-            <h1 className="mt-5 max-w-4xl font-heading text-4xl font-light leading-[1.08] text-white sm:text-5xl xl:text-6xl">
-              {current.title}
-            </h1>
-            <div className="mt-7 h-px w-full max-w-xl bg-white/55" />
-            <p className="mt-7 max-w-2xl text-lg font-light leading-relaxed text-white/90">
-              {current.summary}
-            </p>
-            <Link
-              href={current.href}
-              className="group mt-10 inline-flex min-h-12 items-center gap-4"
-            >
-              <span className="flex h-11 w-11 items-center justify-center bg-accent transition-colors duration-200 group-hover:bg-accent-hover">
-                <Play
-                  aria-hidden="true"
-                  size={14}
-                  strokeWidth={0}
-                  className="fill-white"
-                />
-              </span>
-              <span className="text-xs font-semibold uppercase tracking-cta text-white">
-                {current.cta}
-              </span>
-            </Link>
-          </div>
+        <div key={current.title} className="anim-rise w-full">
+          <p className="text-[11px] font-semibold uppercase tracking-label text-accent-light">
+            {current.kicker}
+          </p>
+          <h1 className="mt-6 max-w-5xl font-heading text-4xl font-light leading-[1.08] text-white sm:text-5xl xl:text-[4.25rem]">
+            {current.title}
+          </h1>
+          <div className="mt-8 h-px w-full max-w-xl bg-white/55" />
+          <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/90">
+            {current.summary}
+          </p>
+          <Link
+            href={current.href}
+            className="group mt-10 inline-flex min-h-12 items-center gap-4"
+          >
+            <span className="flex h-11 w-11 items-center justify-center bg-accent transition-colors duration-200 group-hover:bg-accent-hover">
+              <Play
+                aria-hidden="true"
+                size={14}
+                strokeWidth={0}
+                className="fill-white"
+              />
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-cta text-white">
+              {current.cta}
+            </span>
+          </Link>
         </div>
       </div>
 
