@@ -26,6 +26,7 @@ const config: Config = {
         },
         // ---- Base theme "Charcoal" — 7-tuple from the design handoff.
         base: "#121417", // dark page/hero background
+        hero: "#071A2E", // hero navy — sampled from the 2026-07-22 brand artwork
         footer: "#0C0D0F", // darkest — footer only
         sec1: "#F5F5F6", // light section
         sec2: "#ECEDEE", // alt light section
@@ -75,6 +76,7 @@ const config: Config = {
       },
       letterSpacing: {
         kicker: "0.16em",
+        brand: "0.3em", // ACCURITH wordmark under the monogram
       },
       borderRadius: {
         card: "4px", // deliberately sharp — "audit" feel

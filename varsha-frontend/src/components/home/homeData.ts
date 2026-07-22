@@ -6,46 +6,48 @@ export type HeroSlide = {
   kicker: string;
   title: string;
   summary: string;
-  image: string;
-  deviceHeading: string;
-  devicePlaceholder: string;
-  deviceChips: string[];
-  deviceNote: string;
+  image: string; // insight-strip card art (hero bg itself is fixed)
+  href: string;
+  cta: string;
 };
 
 export const heroSlides: HeroSlide[] = [
+  {
+    kicker: "Insights · Agentic AI",
+    title:
+      "From Automation to Autonomy: Redefining the Operating Model With Agentic AI",
+    summary:
+      "Explore how agentic AI is reshaping operating models to unlock faster decision-making, improved resilience, and scalable business impact.",
+    image: "/images/home/hero-monument.jpg",
+    href: "/services/ai-automation",
+    cta: "Explore more",
+  },
   {
     kicker: "What we do · IS/IT Audit",
     title: "IS & IT Audit",
     summary:
       "IS audits mapped to RBI ITGRCA, SEBI CSCRF and IRDAI — with findings and evidence a regulator will accept.",
-    image: "/images/home/hero-1.png",
-    deviceHeading: "Questions clients ask",
-    devicePlaceholder: "“Where are our gaps against RBI ITGRCA?”",
-    deviceChips: ["Map a control", "Draft a workpaper", "Gap vs ITGRCA"],
-    deviceNote: "DISA-qualified · evidence attached",
+    image: "/images/home/hero-audit.jpg",
+    href: "/services/is-it-audit",
+    cta: "Explore more",
   },
   {
     kicker: "What we do · Cyber Security",
     title: "Cyber Security",
     summary:
       "CERT-In-aligned security audits, VAPT and resilience testing — documented to a standard that stands up to scrutiny.",
-    image: "/images/home/hero-2.png",
-    deviceHeading: "Questions clients ask",
-    devicePlaceholder: "“Are we CERT-In empanelment ready?”",
-    deviceChips: ["VAPT scope", "Resilience test", "Reporting pack"],
-    deviceNote: "ISC2 CC · reproducible methodology",
+    image: "/images/home/hero-cyber.jpg",
+    href: "/services/cyber-security",
+    cta: "Explore more",
   },
   {
     kicker: "What we do · Risk, GRC & Forensics",
     title: "Risk, GRC & Forensics",
     summary:
       "ISO 27001, SOC 2, internal controls, DPDP readiness and FAFD-led digital forensics with defensible chain-of-custody.",
-    image: "/images/home/hero-3.png",
-    deviceHeading: "Questions clients ask",
-    devicePlaceholder: "“Are we DPDP-ready in 90 days?”",
-    deviceChips: ["Consent map", "Retention rules", "Breach playbook"],
-    deviceNote: "DPCAC · FAFD",
+    image: "/images/home/hero-forensics.jpg",
+    href: "/services/risk-grc-advisory",
+    cta: "Explore more",
   },
 ];
 

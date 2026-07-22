@@ -1,39 +1,47 @@
 import Image from "next/image";
 import { cn } from "./ui/cn";
 
-// Real client logo from the 2026-07 design handoff — ribbon "A" mark +
-// wordmark + "Securing today. Empowering tomorrow." tagline, transparent PNG
-// (1909×824). Replaces the "Check Cut" SVG prototype. Ask the client for an
-// SVG master; until then the PNG ships via next/image.
-//
-// theme="dark": the artwork itself is dark-on-transparent, so on dark
-// surfaces (footer) it sits on a small white chip — per the prototype.
+// Permanent brand lockup (2026-07-22 brand sheet, client-confirmed): peak
+// monogram above the spaced ACCURITH wordmark. mark-white / mark-ink PNGs are
+// the two colorways extracted from the sheet — pass theme="dark" on dark
+// surfaces (home hero header), default on light. Ask the client for an SVG
+// master; until then the PNGs ship via next/image.
 
 type Theme = "light" | "dark";
 
 export default function Logo({
   theme = "light",
+  priority = false,
   className,
 }: {
   theme?: Theme;
+  priority?: boolean;
   className?: string;
 }) {
   return (
     <span
-      className={cn(
-        "inline-flex items-center",
-        theme === "dark" && "rounded-lg bg-white px-3 py-2",
-        className,
-      )}
+      className={cn("inline-flex flex-col items-center gap-1.5", className)}
     >
       <Image
-        src="/images/brand/accurith-logo.png"
-        alt="Accurith — Securing today. Empowering tomorrow."
-        width={1909}
-        height={824}
-        priority
-        className={cn("w-auto", theme === "dark" ? "h-9" : "h-14 md:h-16")}
+        src={
+          theme === "dark"
+            ? "/images/brand/mark-white.png"
+            : "/images/brand/mark-ink.png"
+        }
+        alt=""
+        width={400}
+        height={418}
+        priority={priority}
+        className="h-8 w-auto md:h-9"
       />
+      <span
+        className={cn(
+          "font-heading text-xs font-semibold uppercase leading-none tracking-brand",
+          theme === "dark" ? "text-white" : "text-ink",
+        )}
+      >
+        Accurith
+      </span>
     </span>
   );
 }

@@ -1,111 +1,121 @@
 import Link from "next/link";
-import { Linkedin } from "lucide-react";
+import { Linkedin, Mail } from "lucide-react";
 import Logo from "./Logo";
-import { companyLinks, legalPages, services } from "./siteData";
+import { legalPages } from "./siteData";
 
-// Direction B footer — darkest surface, logo on a white chip, blurb + real
-// Bengaluru address, three link columns, legal row.
+// Footer, A&M-style: light gray band with three zones — bold stacked links,
+// company name + address, circled social icons — over a lighter small-print
+// strip with the honest-framing statement, copyright, and legal links.
 
-const contactLinks = [
-  { label: "Request a demo", href: "/contact" },
-  { label: "Book a consultation", href: "/contact" },
-  { label: "Report a vulnerability", href: "/trust/report-vulnerability" },
+const footerLinks = [
+  { label: "Services", href: "/services" },
+  { label: "Products", href: "/products" },
+  { label: "Blog", href: "/blog" },
+  { label: "About", href: "/about" },
+  { label: "Trust & Security", href: "/trust" },
+  { label: "Contact", href: "/contact" },
 ];
 
-const columnHeading =
-  "mb-4 font-mono text-xs uppercase tracking-widest text-slate-400";
-// min-h-11 keeps every footer link a 44px touch target.
-const footerLink =
-  "flex min-h-11 items-center rounded-lg text-sm text-slate-300 transition-colors duration-200 hover:text-accent-light";
+const socialLinks = [
+  {
+    label: "Accurith on LinkedIn",
+    href: "https://www.linkedin.com/company/accurith",
+    icon: Linkedin,
+    external: true,
+  },
+  {
+    label: "Contact Accurith",
+    href: "/contact",
+    icon: Mail,
+    external: false,
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-footer text-slate-300">
-      <div className="mx-auto max-w-content px-6 pb-11 pt-16 md:px-12">
-        <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
-          <div className="flex flex-col items-start gap-4">
-            <Link href="/" className="rounded-lg">
-              <Logo theme="dark" />
-            </Link>
-            <p className="max-w-xs text-[13px] leading-relaxed text-slate-400">
-              Audit-grade AI for India&rsquo;s regulatory reality — IS/IT
-              audit, risk, GRC and digital forensics.
-            </p>
-            <p className="max-w-xs text-[13px] leading-relaxed text-slate-400">
-              #24, 1st Floor, Beside Sai Castle, Balaji Layout, Kodigehalli,
-              Bangalore – 560092
-            </p>
-          </div>
-          <div>
-            <h2 className={columnHeading}>Services</h2>
+    <footer className="text-ink">
+      {/* Main band */}
+      <div className="bg-sec2">
+        <div className="mx-auto grid max-w-content gap-8 px-6 py-10 md:grid-cols-3 md:px-12 md:py-12">
+          <nav aria-label="Footer">
             <ul>
-              {services.map((s) => (
-                <li key={s.slug}>
-                  <Link href={`/services/${s.slug}`} className={footerLink}>
-                    {s.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h2 className={columnHeading}>Company</h2>
-            <ul>
-              {companyLinks.map((l) => (
+              {footerLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className={footerLink}>
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link href="/resources" className={footerLink}>
-                  Insights
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h2 className={columnHeading}>Contact</h2>
-            <ul>
-              {contactLinks.map((l) => (
-                <li key={l.label}>
-                  <Link href={l.href} className={footerLink}>
+                  <Link
+                    href={l.href}
+                    className="flex min-h-9 items-center rounded-lg font-heading text-[15px] font-semibold text-ink transition-colors duration-200 hover:text-accent"
+                  >
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
+          </nav>
+
+          <address className="text-sm not-italic leading-relaxed text-ink-2">
+            <Link href="/" aria-label="Accurith — home" className="mb-4 inline-flex">
+              <Logo />
+            </Link>
+            <p>#24, 1st Floor, Beside Sai Castle</p>
+            <p>Balaji Layout, Kodigehalli</p>
+            <p>Bangalore &ndash; 560092, India</p>
+          </address>
+
+          <div className="flex items-start gap-4 md:justify-end">
+            {socialLinks.map(({ label, href, icon: Icon, external }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                {...(external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-ink text-ink transition-colors duration-200 hover:border-accent hover:text-accent"
+              >
+                <Icon aria-hidden="true" size={18} strokeWidth={1.75} />
+              </a>
+            ))}
           </div>
         </div>
+      </div>
 
-        <div className="mt-11 flex flex-col items-start justify-between gap-4 border-t border-line-footer pt-6 sm:flex-row sm:items-center">
-          <p className="text-xs text-slate-400">
-            © {new Date().getFullYear()} Accurith Technologies Private Limited
-            · Karnataka, India
-          </p>
-          <div className="flex items-center gap-5">
-            {legalPages.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="flex min-h-11 items-center rounded-lg text-xs text-slate-400 transition-colors duration-200 hover:text-accent-light"
-              >
-                {l.label
-                  .replace(" Policy", "")
-                  .replace(" of Service", "")
-                  .replace("Data Processing Agreement", "DPA")}
-              </Link>
-            ))}
-            <a
-              href="https://www.linkedin.com/company/accurith"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Accurith on LinkedIn"
-              className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 transition-colors duration-200 hover:text-accent-light"
+      {/* Small-print strip */}
+      <div className="bg-sec1">
+        <div className="mx-auto max-w-content px-6 py-6 md:px-12">
+          <p className="max-w-4xl text-[13px] leading-relaxed text-ink-3">
+            Accurith Technologies Private Limited provides IS/IT audit, cyber
+            security, risk, GRC, and digital forensics advisory. We align our
+            work to frameworks such as ISO 27001, SOC 2, NIST CSF, and COBIT;
+            alignment statements describe our delivery approach and are not
+            certification claims. To report a security vulnerability in this
+            website, see our{" "}
+            <Link
+              href="/trust/report-vulnerability"
+              className="text-accent-dark underline underline-offset-2 transition-colors duration-200 hover:text-accent"
             >
-              <Linkedin aria-hidden="true" size={20} strokeWidth={1.75} />
-            </a>
+              responsible disclosure page
+            </Link>
+            .
+          </p>
+          <div className="mt-3 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+            <p className="text-xs text-ink-3">
+              &copy; {new Date().getFullYear()} Accurith Technologies Private
+              Limited &middot; Karnataka, India
+            </p>
+            <div className="flex flex-wrap items-center gap-x-5">
+              {legalPages.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="flex min-h-9 items-center rounded-lg text-xs text-ink-3 transition-colors duration-200 hover:text-accent"
+                >
+                  {l.label
+                    .replace(" Policy", "")
+                    .replace(" of Service", "")
+                    .replace("Data Processing Agreement", "DPA")}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

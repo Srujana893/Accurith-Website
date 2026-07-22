@@ -4,18 +4,25 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, X } from "lucide-react";
-import Logo from "./Logo";
 import { cn } from "./ui/cn";
+import Logo from "./Logo";
 import { primaryNav } from "./siteData";
 
-// Direction B header — white bar, real logo, click-to-open dropdowns with
-// label + one-line desc (Services, Company), solid accent "Request a demo".
+// Direction B header — click-to-open dropdowns with label + one-line desc
+// (Services, Company), solid accent "Request a demo". On the home page the
+// header overlays the dark hero (transparent, white links) and stays dark
+// after scroll, so no white strip ever covers the hero. Brand is the shared
+// Logo lockup (mark above spaced wordmark, per the 2026-07-22 brand sheet).
 // A11y: Escape + click-outside close, focus-trapped mobile slide-over.
 
-function Brand() {
+function Brand({ dark }: { dark: boolean }) {
   return (
-    <Link href="/" className="rounded-lg">
-      <Logo />
+    <Link
+      href="/"
+      aria-label="Accurith — home"
+      className="flex rounded-lg py-1"
+    >
+      <Logo theme={dark ? "dark" : "light"} priority />
     </Link>
   );
 }
@@ -24,6 +31,7 @@ export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
@@ -37,6 +45,14 @@ export default function Header() {
     setMobileOpen(false);
     setOpenMenu(null);
   }
+
+  // Track scroll so the home-page overlay header can go solid past the top.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Desktop dropdowns: close on Escape or click outside the nav.
   useEffect(() => {
@@ -92,17 +108,39 @@ export default function Header() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // Home starts with a full-bleed dark hero, so the header floats over it —
+  // transparent at the top, dark (never white) once scrolled. Only the white
+  // mobile slide-over flips it to the light treatment.
+  const isHome = pathname === "/";
+  const dark = isHome && !mobileOpen;
+
   const navLinkClasses = (active: boolean) =>
     cn(
       "rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200",
-      active ? "text-accent" : "text-ink-2 hover:bg-sec1 hover:text-ink",
+      dark
+        ? active
+          ? "text-white"
+          : "text-white/85 hover:bg-white/10 hover:text-white"
+        : active
+          ? "text-accent"
+          : "text-ink-2 hover:bg-sec1 hover:text-ink",
     );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line-light bg-white">
+    <header
+      className={cn(
+        "top-0 z-40 border-b transition-colors duration-300",
+        isHome ? "fixed inset-x-0" : "sticky",
+        dark
+          ? scrolled
+            ? "border-white/10 bg-hero/95 backdrop-blur"
+            : "border-transparent bg-transparent"
+          : "border-line-light bg-white",
+      )}
+    >
       <div className="mx-auto flex h-20 max-w-content items-center justify-between px-6 md:h-24 md:px-12">
         <div className="flex items-center gap-8 xl:gap-11">
-          <Brand />
+          <Brand dark={dark} />
 
           {/* Desktop nav */}
           <nav
@@ -192,7 +230,10 @@ export default function Header() {
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           onClick={() => setMobileOpen((o) => !o)}
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-ink lg:hidden"
+          className={cn(
+            "flex h-11 w-11 items-center justify-center rounded-lg lg:hidden",
+            dark ? "text-white" : "text-ink",
+          )}
         >
           {mobileOpen ? (
             <X aria-hidden="true" size={24} strokeWidth={1.75} />

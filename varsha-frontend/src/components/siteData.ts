@@ -115,7 +115,7 @@ export const primaryNav: NavItem[] = [
     })),
   },
   { label: "Products", href: "/products" },
-  { label: "Insights", href: "/resources" },
+  { label: "Blog", href: "/blog" },
   { label: "Company", href: "/about", children: companyLinks },
 ];
 
