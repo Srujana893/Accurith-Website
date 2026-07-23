@@ -32,9 +32,9 @@ export const blogPosts: BlogPost[] = [
     date: "July 2026",
     readTime: "9 min read",
     featured: true,
-    image: "/images/home/hero-bg.jpg",
-    imageAlt: "Night city skyline with data overlays",
-    imagePos: "left",
+    image: "/images/home/featured-robot.jpg",
+    imageAlt:
+      "Humanoid robot in a thinking pose against a deep blue ground with an electric-blue glow",
   },
   {
     slug: "what-a-first-is-audit-covers",
