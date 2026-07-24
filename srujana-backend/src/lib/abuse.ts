@@ -78,10 +78,12 @@ export function checkRateLimit({ ip, bucket, windowMs, max }: RateLimitOptions):
 }
 
 // Cheap periodic sweep so the Map does not accumulate forever. Runs on every
-// call — O(n) but n is tiny at our scale.
-export function pruneExpiredBuckets(now = Date.now(), windowMs = 60_000): void {
+// call — O(n) but n is tiny at our scale. windowMs MUST match the rate-limit
+// window used by the caller; otherwise a bucket can be deleted before its
+// limit window has actually elapsed, silently raising the effective limit.
+export function pruneExpiredBuckets(windowMs: number, now = Date.now()): void {
   for (const [k, v] of buckets) {
-    if (now - v.windowStart >= windowMs * 2) buckets.delete(k);
+    if (now - v.windowStart >= windowMs) buckets.delete(k);
   }
 }
 

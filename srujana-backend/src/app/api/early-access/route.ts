@@ -38,16 +38,17 @@ export function OPTIONS(req: Request): Response {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  // Content-type guard FIRST — see /api/contact for the CSRF reasoning.
+  const ct = req.headers.get('content-type') ?? '';
+  if (!ct.toLowerCase().includes('application/json')) {
+    return fail(req, 415, 'Unsupported content type.');
+  }
+
   const declaredLen = Number(req.headers.get('content-length') ?? '0');
   if (declaredLen > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
 
   const raw = await req.text();
   if (raw.length > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
-
-  const ct = req.headers.get('content-type') ?? '';
-  if (!ct.toLowerCase().includes('application/json')) {
-    return fail(req, 415, 'Unsupported content type.');
-  }
 
   let parsed: unknown;
   try {
@@ -69,8 +70,9 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const ip = clientIp(req);
-  const rl = checkRateLimit({ ip, bucket: 'early-access', windowMs: 10 * 60_000, max: 5 });
-  pruneExpiredBuckets();
+  const RATE_WINDOW_MS = 10 * 60_000;
+  const rl = checkRateLimit({ ip, bucket: 'early-access', windowMs: RATE_WINDOW_MS, max: 5 });
+  pruneExpiredBuckets(RATE_WINDOW_MS);
   if (!rl.ok) {
     return fail(req, 429, 'Too many submissions. Please try again shortly.', {
       'Retry-After': String(rl.retryAfterSec),

@@ -48,18 +48,22 @@ export function OPTIONS(req: Request): Response {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  // 1. Body size cap. Rejects a lying Content-Length or oversized text body.
+  // 1. Content-type guard FIRST — cheapest check and defends against a
+  // cross-site <form enctype="text/plain"> CSRF: those POSTs are CORS
+  // "simple requests" (no preflight), come from victim IPs, and would each
+  // otherwise open a fresh rate-limit bucket. We refuse them before we
+  // read the body, parse, or touch the limiter.
+  const ct = req.headers.get('content-type') ?? '';
+  if (!ct.toLowerCase().includes('application/json')) {
+    return fail(req, 415, 'Unsupported content type.');
+  }
+
+  // 2. Body size cap. Rejects a lying Content-Length or oversized text body.
   const declaredLen = Number(req.headers.get('content-length') ?? '0');
   if (declaredLen > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
 
   const raw = await req.text();
   if (raw.length > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
-
-  // 2. Content-type guard — anything else is either a bot or misconfigured.
-  const ct = req.headers.get('content-type') ?? '';
-  if (!ct.toLowerCase().includes('application/json')) {
-    return fail(req, 415, 'Unsupported content type.');
-  }
 
   // 3. Parse.
   let parsed: unknown;
@@ -85,10 +89,12 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  // 6. Rate limit (per IP, 5 hits per 10 minutes).
+  // 6. Rate limit (per IP, 5 hits per 10 minutes). The prune window MUST
+  // match the limit window — see abuse.ts.
   const ip = clientIp(req);
-  const rl = checkRateLimit({ ip, bucket: 'contact', windowMs: 10 * 60_000, max: 5 });
-  pruneExpiredBuckets();
+  const RATE_WINDOW_MS = 10 * 60_000;
+  const rl = checkRateLimit({ ip, bucket: 'contact', windowMs: RATE_WINDOW_MS, max: 5 });
+  pruneExpiredBuckets(RATE_WINDOW_MS);
   if (!rl.ok) {
     return fail(req, 429, 'Too many submissions. Please try again shortly.', {
       'Retry-After': String(rl.retryAfterSec),
