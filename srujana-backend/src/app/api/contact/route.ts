@@ -1,12 +1,15 @@
-// POST /api/consultation — "Book a consultation" enquiry form.
+// POST /api/contact — "Book a consultation" enquiry form.
 //
 // Contract (agreed with Varsha, J01):
-//   POST /api/consultation
+//   POST /api/contact
 //   Content-Type: application/json
 //   Body: { name, email, company, role, service, message, website? }
 //     - "website" is the honeypot — hidden field, real users leave it empty.
 //   Response 200: { success: true }
 //   Response 4xx/5xx: { success: false, error: "<generic message>" }
+//
+// Row lands in the Consultation Prisma table — the URL changed to match
+// Varsha's mock (POST /api/contact), the DB model name did not.
 //
 // Order of operations is deliberate:
 //   1. validate — cheapest check first, refuses garbage before we spend I/O
@@ -20,29 +23,42 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { consultationSchema } from '@/lib/validation';
+import { contactSchema } from '@/lib/validation';
 import { sendNotification, escapeHtml } from '@/lib/mail';
 import { clientIp, checkRateLimit, pruneExpiredBuckets, MAX_BODY_BYTES } from '@/lib/abuse';
+import { corsHeaders, handlePreflight } from '@/lib/cors';
 
-function fail(status: number, error: string, extraHeaders?: HeadersInit): NextResponse {
+function fail(
+  req: Request,
+  status: number,
+  error: string,
+  extraHeaders?: HeadersInit,
+): NextResponse {
   return NextResponse.json(
     { success: false, error },
-    { status, headers: { 'Cache-Control': 'no-store', ...extraHeaders } },
+    {
+      status,
+      headers: { 'Cache-Control': 'no-store', ...corsHeaders(req), ...extraHeaders },
+    },
   );
+}
+
+export function OPTIONS(req: Request): Response {
+  return handlePreflight(req);
 }
 
 export async function POST(req: Request): Promise<Response> {
   // 1. Body size cap. Rejects a lying Content-Length or oversized text body.
   const declaredLen = Number(req.headers.get('content-length') ?? '0');
-  if (declaredLen > MAX_BODY_BYTES) return fail(413, 'Payload too large.');
+  if (declaredLen > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
 
   const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) return fail(413, 'Payload too large.');
+  if (raw.length > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
 
   // 2. Content-type guard — anything else is either a bot or misconfigured.
   const ct = req.headers.get('content-type') ?? '';
   if (!ct.toLowerCase().includes('application/json')) {
-    return fail(415, 'Unsupported content type.');
+    return fail(req, 415, 'Unsupported content type.');
   }
 
   // 3. Parse.
@@ -50,28 +66,31 @@ export async function POST(req: Request): Promise<Response> {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    return fail(400, 'Invalid JSON.');
+    return fail(req, 400, 'Invalid JSON.');
   }
 
   // 4. Validate.
-  const result = consultationSchema.safeParse(parsed);
+  const result = contactSchema.safeParse(parsed);
   if (!result.success) {
-    return fail(400, 'Please check the form and try again.');
+    return fail(req, 400, 'Please check the form and try again.');
   }
   const body = result.data;
 
   // 5. Honeypot. Return 200 so bots log "OK" and move on.
   if (typeof body.website === 'string' && body.website.length > 0) {
-    console.log('consultation: honeypot triggered, dropping');
-    return NextResponse.json({ success: true }, { headers: { 'Cache-Control': 'no-store' } });
+    console.log('contact: honeypot triggered, dropping');
+    return NextResponse.json(
+      { success: true },
+      { headers: { 'Cache-Control': 'no-store', ...corsHeaders(req) } },
+    );
   }
 
   // 6. Rate limit (per IP, 5 hits per 10 minutes).
   const ip = clientIp(req);
-  const rl = checkRateLimit({ ip, bucket: 'consultation', windowMs: 10 * 60_000, max: 5 });
+  const rl = checkRateLimit({ ip, bucket: 'contact', windowMs: 10 * 60_000, max: 5 });
   pruneExpiredBuckets();
   if (!rl.ok) {
-    return fail(429, 'Too many submissions. Please try again shortly.', {
+    return fail(req, 429, 'Too many submissions. Please try again shortly.', {
       'Retry-After': String(rl.retryAfterSec),
     });
   }
@@ -92,8 +111,8 @@ export async function POST(req: Request): Promise<Response> {
     });
   } catch (err) {
     // Never surface the ORM name or column detail — that's reconnaissance.
-    console.error('consultation: db insert failed', err);
-    return fail(500, 'We could not save your message. Please try again shortly.');
+    console.error('contact: db insert failed', err);
+    return fail(req, 500, 'We could not save your message. Please try again shortly.');
   }
 
   // 8. Email the team. Best-effort — a failed alert does not fail the request.
@@ -140,13 +159,15 @@ export async function POST(req: Request): Promise<Response> {
     // Row is saved; log loudly so we can catch up manually. Do NOT surface
     // to the client — from their side the enquiry landed and we owe them a
     // response, which we do owe them from the DB row.
-    console.error('consultation: mail send failed (record saved)', saved.id, err);
+    console.error('contact: mail send failed (record saved)', saved.id, err);
   }
 
-  return NextResponse.json({ success: true }, { headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json(
+    { success: true },
+    { headers: { 'Cache-Control': 'no-store', ...corsHeaders(req) } },
+  );
 }
 
-// GET etc.
 export function GET() {
   return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed.' }), {
     status: 405,

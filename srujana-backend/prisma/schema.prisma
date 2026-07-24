@@ -39,6 +39,28 @@ enum ConsultationStatus {
   CLOSED
 }
 
+// EarlyAccess — a "request early access" submission from the Products page.
+// Varsha's EarlyAccessForm posts { name, email, product } to /api/early-access.
+model EarlyAccess {
+  id        String            @id @default(cuid())
+  createdAt DateTime          @default(now())
+
+  name      String
+  email     String
+  product   String
+
+  status    EarlyAccessStatus @default(NEW)
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+enum EarlyAccessStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
 // JobOpening — powers the /careers page. Varsha's page reads this via
 // GET /api/careers/openings. I add/edit openings via Railway's Postgres
 // dashboard (or `npx prisma studio` locally).

@@ -1,22 +1,19 @@
-// POST /api/careers/apply — job application.
+// POST /api/early-access — "Request early access" form on the Products page.
 //
-// Contract:
-//   POST /api/careers/apply
+// Contract (agreed with Varsha):
+//   POST /api/early-access
 //   Content-Type: application/json
-//   Body: {
-//     openingId, name, email, phone, linkedinUrl, portfolioUrl?, coverNote,
-//     website?  // honeypot
-//   }
+//   Body: { name, email, product, website? }
+//     - "website" is the honeypot, same as /api/contact.
 //   Response 200: { success: true }
 //   Response 4xx/5xx: { success: false, error: "<generic>" }
 //
-// NO CV file uploads. Applicants give links. We are a cyber-security firm;
-// an endpoint that accepts arbitrary binaries from strangers is exactly the
-// thing a buyer's pentest report will lead with.
+// Same shape as /api/contact deliberately — same validation library, same
+// rate limiter (separate bucket), same best-effort mail.
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { applicationSchema } from '@/lib/validation';
+import { earlyAccessSchema } from '@/lib/validation';
 import { sendNotification, escapeHtml } from '@/lib/mail';
 import { clientIp, checkRateLimit, pruneExpiredBuckets, MAX_BODY_BYTES } from '@/lib/abuse';
 import { corsHeaders, handlePreflight } from '@/lib/cors';
@@ -43,6 +40,7 @@ export function OPTIONS(req: Request): Response {
 export async function POST(req: Request): Promise<Response> {
   const declaredLen = Number(req.headers.get('content-length') ?? '0');
   if (declaredLen > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
+
   const raw = await req.text();
   if (raw.length > MAX_BODY_BYTES) return fail(req, 413, 'Payload too large.');
 
@@ -58,12 +56,12 @@ export async function POST(req: Request): Promise<Response> {
     return fail(req, 400, 'Invalid JSON.');
   }
 
-  const result = applicationSchema.safeParse(parsed);
+  const result = earlyAccessSchema.safeParse(parsed);
   if (!result.success) return fail(req, 400, 'Please check the form and try again.');
   const body = result.data;
 
   if (typeof body.website === 'string' && body.website.length > 0) {
-    console.log('apply: honeypot triggered, dropping');
+    console.log('early-access: honeypot triggered, dropping');
     return NextResponse.json(
       { success: true },
       { headers: { 'Cache-Control': 'no-store', ...corsHeaders(req) } },
@@ -71,7 +69,7 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const ip = clientIp(req);
-  const rl = checkRateLimit({ ip, bucket: 'apply', windowMs: 10 * 60_000, max: 5 });
+  const rl = checkRateLimit({ ip, bucket: 'early-access', windowMs: 10 * 60_000, max: 5 });
   pruneExpiredBuckets();
   if (!rl.ok) {
     return fail(req, 429, 'Too many submissions. Please try again shortly.', {
@@ -79,68 +77,37 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  // Verify the opening exists AND is open. Doing this in a single query means
-  // an attacker can't distinguish "unknown role" from "closed role".
-  const opening = await prisma.jobOpening.findFirst({
-    where: { id: body.openingId, isOpen: true },
-    select: { id: true, title: true, slug: true },
-  });
-  if (!opening) return fail(req, 404, 'This role is no longer accepting applications.');
-
   let saved;
   try {
-    saved = await prisma.jobApplication.create({
-      data: {
-        openingId: opening.id,
-        name: body.name,
-        email: body.email,
-        phone: body.phone,
-        linkedinUrl: body.linkedinUrl,
-        portfolioUrl: body.portfolioUrl && body.portfolioUrl.length > 0 ? body.portfolioUrl : null,
-        coverNote: body.coverNote,
-      },
+    saved = await prisma.earlyAccess.create({
+      data: { name: body.name, email: body.email, product: body.product },
       select: { id: true },
     });
   } catch (err) {
-    console.error('apply: db insert failed', err);
-    return fail(req, 500, 'We could not save your application. Please try again shortly.');
+    console.error('early-access: db insert failed', err);
+    return fail(req, 500, 'We could not save your request. Please try again shortly.');
   }
 
-  const subject = `New application — ${opening.title} (${body.name})`;
+  const subject = `New early-access request — ${body.product} (${body.name})`;
   const text = [
-    `New application from accurith.com/careers`,
+    `New early-access request from accurith.com/products`,
     ``,
-    `Role:      ${opening.title} (${opening.slug})`,
-    `Name:      ${body.name}`,
-    `Email:     ${body.email}`,
-    `Phone:     ${body.phone}`,
-    `LinkedIn:  ${body.linkedinUrl}`,
-    ...(body.portfolioUrl ? [`Portfolio: ${body.portfolioUrl}`] : []),
-    ``,
-    `Cover note:`,
-    body.coverNote,
+    `Product: ${body.product}`,
+    `Name:    ${body.name}`,
+    `Email:   ${body.email}`,
     ``,
     `Record id: ${saved.id}`,
   ].join('\n');
 
-  const portfolioRow =
-    body.portfolioUrl && body.portfolioUrl.length > 0
-      ? `<tr><td><b>Portfolio</b></td><td><a href="${escapeHtml(body.portfolioUrl)}">${escapeHtml(body.portfolioUrl)}</a></td></tr>`
-      : '';
-
   const html = `
 <!doctype html>
 <html><body style="font-family:system-ui,sans-serif;color:#1B2A4A;line-height:1.5;">
-  <h2 style="color:#0E9E82;margin:0 0 12px;">New application — ${escapeHtml(opening.title)}</h2>
+  <h2 style="color:#0E9E82;margin:0 0 12px;">New early-access request</h2>
   <table cellpadding="4">
+    <tr><td><b>Product</b></td><td>${escapeHtml(body.product)}</td></tr>
     <tr><td><b>Name</b></td><td>${escapeHtml(body.name)}</td></tr>
     <tr><td><b>Email</b></td><td><a href="mailto:${escapeHtml(body.email)}">${escapeHtml(body.email)}</a></td></tr>
-    <tr><td><b>Phone</b></td><td>${escapeHtml(body.phone)}</td></tr>
-    <tr><td><b>LinkedIn</b></td><td><a href="${escapeHtml(body.linkedinUrl)}">${escapeHtml(body.linkedinUrl)}</a></td></tr>
-    ${portfolioRow}
   </table>
-  <h3 style="margin:16px 0 4px;">Cover note</h3>
-  <pre style="white-space:pre-wrap;font-family:inherit;background:#f5f7fa;padding:12px;border-radius:6px;">${escapeHtml(body.coverNote)}</pre>
   <p style="color:#666;font-size:12px;">Record id: ${saved.id}</p>
 </body></html>`.trim();
 
@@ -153,7 +120,7 @@ export async function POST(req: Request): Promise<Response> {
       replyToName: body.name,
     });
   } catch (err) {
-    console.error('apply: mail send failed (record saved)', saved.id, err);
+    console.error('early-access: mail send failed (record saved)', saved.id, err);
   }
 
   return NextResponse.json(

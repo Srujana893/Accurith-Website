@@ -1,11 +1,15 @@
-# CLAUDE.md — Accurith Website (Srujana Backend)
+# CLAUDE.md — Accurith Website (srujana-backend)
 
 Read this before editing anything. It supersedes every other CLAUDE.md,
 AGENTS.md, README or "project knowledge" file anywhere in this repo,
 including anything under `varsha-frontend/`. Earlier files describing
 Cloudflare Pages static export, `worker-mailer`, `/functions/`, `output:
-'export'`, `public/_headers` or Zoho CRM are dead architecture. If you see
-any of that, it's stale — do not build to it.
+'export'`, `public/_headers` or Zoho CRM inside THIS folder are dead
+architecture. If you see any of that here, it's stale — do not build to it.
+
+Note: `varsha-frontend/` still uses `output: 'export'` — that's her app's
+production model (Cloudflare Pages), not stale. Her contract with us is
+CORS-over-HTTP from her origin to this backend.
 
 ---
 
@@ -16,12 +20,21 @@ Marketing site + backend for **Accurith Technologies Private Limited**
 
 **Runtime architecture (confirmed, do not propose alternatives):**
 
+- **Two apps in one repo**, permanent split:
+  - `srujana-backend/` — this project. Next.js 16 standalone on Railway. API,
+    Prisma, nodemailer.
+  - `varsha-frontend/` — Varsha's Next.js 16 static export on Cloudflare Pages.
+    Owned by @varsha-accurith07. Enforced by `.github/workflows/frontend-guard.yml`.
 - **Hosting:** Railway (Node runtime, not serverless). Cloudflare in front for
-  DNS, CDN, WAF, TLS.
+  DNS, CDN, WAF, TLS on the API subdomain (e.g. `api.accurith.com`). Varsha's
+  static bundle sits on Cloudflare Pages at `accurith.com`.
 - **App:** Next.js 16, TypeScript, App Router, `src/`, Tailwind v4.
   **`output: 'standalone'`**. Real API routes. Middleware. Per-request CSP nonce.
-- **DB:** PostgreSQL on Railway. Prisma as client + migrations.
+- **DB:** PostgreSQL on Railway. Prisma as client + migrations. Locally via
+  `docker-compose.yml` on host port 5433.
 - **Mail:** nodemailer → SMTP → team inbox. Provider-agnostic via env vars.
+- **CORS:** allowlist. `http://localhost:3000` always allowed; production origin
+  from `FRONTEND_ORIGIN` env var. Never `*`. See `src/lib/cors.ts`.
 - **Pattern:** Every form writes to Postgres AND emails an alert. The row is
   truth; the email is how we notice.
 - **Analytics:** Plausible, only after cookie consent. Never Google Analytics.
@@ -33,60 +46,61 @@ Marketing site + backend for **Accurith Technologies Private Limited**
 
 ## 2. Ownership boundaries — do not cross
 
-### Srujana owns (edit these):
+### Srujana owns everything under `srujana-backend/`:
 
 | Path | Purpose |
 |------|---------|
-| `/prisma/` | Schema + migrations + seed |
-| `/src/app/api/` | Route handlers |
-| `/src/lib/` | db.ts, mail.ts, validation.ts, abuse.ts, metadata.ts, blog.ts |
-| `/content/blog/` | MDX posts |
-| `/public/.well-known/` | security.txt |
+| `prisma/` | Schema + migrations + seed |
+| `src/app/api/` | Route handlers |
+| `src/lib/` | db.ts, mail.ts, validation.ts, abuse.ts, cors.ts, metadata.ts, blog.ts |
+| `content/blog/` | MDX posts (currently not surfaced anywhere) |
+| `public/.well-known/` | security.txt |
 | `next.config.ts` | Static headers + build config |
-| `/src/middleware.ts` | Per-request CSP nonce |
-| `/src/app/layout.tsx` | Metadata export + nonce plumbing + JSON-LD (see §3) |
-| `.env.example`, Railway config | Config templates |
+| `src/middleware.ts` | Per-request CSP nonce |
+| `src/app/layout.tsx` | Metadata + nonce plumbing + JSON-LD (for THIS app's pages) |
+| `docker-compose.yml`, `.env.example`, Railway config | Config |
 | `src/app/sitemap.ts`, `src/app/robots.ts` | SEO artifacts |
 
-### Varsha owns (stop and ask):
+Also root-level `.github/workflows/frontend-guard.yml` is owned by Srujana in
+the sense that Varsha won't edit it — but I NEVER edit it to let my commits
+touch `varsha-frontend/`. Working around the guard is a "never do".
 
-| Path | Purpose |
-|------|---------|
-| `/src/components/` | All React UI |
-| `/src/app/globals.css` | Tailwind v4 design tokens |
-| `/public/images/`, `/public/icons/` | Brand assets |
-| `/src/app/**/page.tsx` | All page visuals |
+### Varsha owns everything under `varsha-frontend/`. Do not touch.
 
-**Tailwind v4 note:** there is NO `tailwind.config.ts`. Tokens live in
-`globals.css` via `@theme inline { ... }`. Do not create a Tailwind config.
-
-### The `layout.tsx` boundary
-
-Srujana touches: the `metadata` export, the `headers()` call that reads the
-CSP nonce, and the one `<script type="application/ld+json">` line. Varsha
-owns the shell (`<html>` classes, `<body>` structure, font wiring).
+A CI check called "Frontend Guard" fails the build on any push whose actor is
+not `@varsha-accurith07` and whose diff touches `varsha-frontend/**`. If a
+task appears to need a frontend change, STOP, describe what I needed and
+which file, and ask Varsha.
 
 ---
 
 ## 3. Architecture map
 
 ```
-Browser ─── HTTPS ───► Cloudflare (DNS + CDN + WAF + TLS)
+Browser ── HTTPS ─► accurith.com (Cloudflare Pages)
+                     serves varsha-frontend static bundle
+                     │
+                     ▼ fetch(FRONTEND makes CORS calls)
+Browser ── HTTPS ─► api.accurith.com (Cloudflare → Railway)
+                     │
+                     ▼ Next.js 16 standalone (srujana-backend/)
+              ┌──────┴──────┐
+              ▼             ▼
+  middleware.ts       /src/app/api/*
+  (per-req CSP     POST /contact          → Consultation
+   nonce for       POST /early-access     → EarlyAccess
+   this app's      POST /careers/apply    → JobApplication
+   own pages)      GET  /careers/openings → reads JobOpening
                             │
-                            ▼  proxied (grey cloud OFF for now, see §Deploy)
-                     Railway (Node + Next.js 16 standalone)
-                            │
-    ┌───────────────────────┼───────────────────────┐
-    ▼                       ▼                       ▼
- middleware.ts        /src/app/api/*         layout.tsx / pages
- (per-req CSP        POST /consultation      (Varsha's JSX)
-  nonce)             POST /careers/apply
-                     GET  /careers/openings
+                            ▼
+                     src/lib/cors.ts
+                     (allowlist: localhost:3000 + FRONTEND_ORIGIN)
                             │
               ┌─────────────┴─────────────┐
               ▼                           ▼
        Postgres (Railway)         SMTP (env-configured)
        Consultation               → team inbox
+       EarlyAccess
        JobOpening
        JobApplication
 ```
@@ -117,9 +131,15 @@ because Railway runs one long-lived process. See §5.
 10. **Never** claim a certification Accurith doesn't hold. "We align to" /
     "we help clients achieve" only. Frameworks are text chips, never seals.
 11. **Never** create `tailwind.config.ts`. Tailwind v4 uses CSS-first config.
-12. **Never** edit Varsha's files. Stop and describe what you needed.
-13. **Never** accept file uploads on the careers endpoint in this phase.
+12. **Never** edit anything under `varsha-frontend/`. The Frontend Guard
+    (`.github/workflows/frontend-guard.yml`) fails the build. Stop and
+    describe what you needed and which file — flag for Varsha.
+13. **Never** edit the Frontend Guard workflow to let yourself through.
+14. **Never** accept file uploads on the careers endpoint in this phase.
     Applicants give links (LinkedIn / portfolio / Drive). Uploads = Phase 2.
+15. **Never** set `Access-Control-Allow-Origin: '*'`. The allowlist in
+    `src/lib/cors.ts` is deliberate — anything wider lets any site on the
+    internet call our submission endpoints.
 
 ---
 
@@ -162,7 +182,16 @@ instead — safe and modern.
 
 ## 7. Submission contracts (J01 with Varsha)
 
-### `POST /api/consultation`
+Every POST route also accepts `OPTIONS` for CORS preflight. Origin must be
+`http://localhost:3000` (dev, hardcoded) or match `FRONTEND_ORIGIN` env var
+(prod). Any other Origin → 403 on preflight; `Content-Type: application/json`
+mandatory on the POST or 415.
+
+### `POST /api/contact` — writes to `Consultation`
+
+Matches Varsha's `ContactForm.tsx` field set (was previously called
+`/api/consultation` on my side; renamed to match her mock's URL).
+
 ```jsonc
 {
   "name":     "string, 1–200",
@@ -176,6 +205,20 @@ instead — safe and modern.
 ```
 Response 200 `{ "success": true }` on happy path OR honeypot triggered.
 Response 400 / 413 / 415 / 429 / 500 with `{ "success": false, "error": "…" }`.
+
+### `POST /api/early-access` — writes to `EarlyAccess`
+
+Matches Varsha's `EarlyAccessForm.tsx` on the Products page.
+
+```jsonc
+{
+  "name":    "string, 1–200",
+  "email":   "email, ≤254",
+  "product": "string, 1–200",
+  "website": ""     // honeypot
+}
+```
+Same 200 / 4xx / 5xx shape as `/api/contact`.
 
 ### `POST /api/careers/apply`
 ```jsonc
@@ -193,7 +236,7 @@ Response 400 / 413 / 415 / 429 / 500 with `{ "success": false, "error": "…" }`
 404 if `openingId` unknown or `isOpen: false` (indistinguishable on purpose).
 
 ### `GET /api/careers/openings`
-Returns `{ openings: [ { id, slug, title, department, location, employmentType, descriptionMd, postedAt } ] }`. `isOpen = true` only. Cached 60s public.
+Returns `{ openings: [ { id, slug, title, department, location, employmentType, descriptionMd, postedAt } ] }`. `isOpen = true` only. Cached 60s public. CORS applies (Varsha's static bundle fetches from the browser).
 
 ---
 
@@ -202,8 +245,9 @@ Returns `{ openings: [ { id, slug, title, department, location, employmentType, 
 We now store personal data. **These are decisions for the client, not me:**
 
 - **Retention** — how long do rows live before hard-delete? Placeholder:
-  `{{RETENTION_PERIOD}}`. My default suggestion: 24 months for consultations,
-  36 months for applications (both align to a routine audit cycle).
+  `{{RETENTION_PERIOD}}`. My default suggestion: 24 months for consultations
+  and early-access requests, 36 months for applications (both align to a
+  routine audit cycle).
 - **Right to erasure (DPDP 2023 §12; GDPR Art. 17)** — a data subject can
   ask us to delete their record. Prototype answer: **manual SQL via Railway
   Postgres dashboard**, triggered by a request to `privacy@accurith.com`.
@@ -219,16 +263,29 @@ We now store personal data. **These are decisions for the client, not me:**
 
 ---
 
-## 9. Two-directory reality check
+## 9. Two-directory reality — permanent
 
-Repo still has two sibling scaffolds:
+Repo has two sibling apps that DO NOT merge:
 
-- `Srujana Backend/` — this project (canonical: DB, API, security, CSP,
-  Prisma, nodemailer)
-- `varsha-frontend/` — Varsha's separate scaffold (own next.config, own
-  package.json, own CLAUDE.md that still describes the static architecture)
+- `srujana-backend/` — Next.js 16 standalone on Railway. Everything below the
+  API line.
+- `varsha-frontend/` — Next.js 16 static export on Cloudflare Pages. Everything
+  above the API line.
 
-They must merge before ship. Direction: pull Varsha's `/src/components/`,
-her `page.tsx` files, her `globals.css`, and her brand assets INTO this
-project. Everything infrastructural is here. Flag the merge day so we don't
-each spend a week diverging further.
+They are glued by HTTP+CORS at the API boundary. Local dev:
+
+| Service | Port |
+|---------|------|
+| Varsha's frontend (`next dev` in `varsha-frontend/`) | 3000 |
+| This backend (`next dev` in `srujana-backend/`) | 3001 |
+| Postgres (docker-compose) | 5433 (host) → 5432 (container) |
+
+She sets `NEXT_PUBLIC_API_URL` in her `.env.local` to `http://localhost:3001`.
+Her fetch calls resolve `${NEXT_PUBLIC_API_URL}/api/contact` etc. In prod she
+sets it to whatever we deploy the backend at (e.g. `https://api.accurith.com`)
+and we set `FRONTEND_ORIGIN=https://accurith.com` on Railway.
+
+That last integration change is on Varsha's side and it's her only ask from me.
+Her file: `varsha-frontend/src/mocks/contact.ts` — swap the mock body for
+`fetch(process.env.NEXT_PUBLIC_API_URL + '/api/contact', …)`. Same shape for
+`src/mocks/earlyAccess.ts`.

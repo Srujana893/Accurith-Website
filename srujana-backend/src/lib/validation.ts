@@ -52,8 +52,9 @@ const httpUrl = z
 // learns which field is the trap.
 const honeypot = z.string().max(1000).optional();
 
-// Consultation form — matches /api/consultation body.
-export const consultationSchema = z.object({
+// Contact form — matches /api/contact body. Field set is what Varsha's
+// ContactForm.tsx sends (J01 contract). Row lands in the Consultation table.
+export const contactSchema = z.object({
   name: shortText,
   email,
   company: shortText,
@@ -62,7 +63,17 @@ export const consultationSchema = z.object({
   message: longText,
   website: honeypot,
 });
-export type ConsultationInput = z.infer<typeof consultationSchema>;
+export type ContactInput = z.infer<typeof contactSchema>;
+
+// Early-access form — matches /api/early-access body. Field set is what
+// Varsha's EarlyAccessForm.tsx sends.
+export const earlyAccessSchema = z.object({
+  name: shortText,
+  email,
+  product: shortText,
+  website: honeypot,
+});
+export type EarlyAccessInput = z.infer<typeof earlyAccessSchema>;
 
 // Job application form — matches /api/careers/apply body.
 export const applicationSchema = z.object({
